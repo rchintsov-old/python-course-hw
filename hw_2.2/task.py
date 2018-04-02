@@ -25,17 +25,21 @@ def field_filter_wrapper(func):
 
 @select_wrapper
 def select(field_name: list):
+    '''Принимает параметры для фильтрации полей вывода'''
     pass
 
 
 @field_filter_wrapper
 def field_filter(field_name: str, collection: list):
+    '''Принимает параметры для фильтрации по полю и значению'''
     pass
 
 
 def query(collection: list, select: function, field_filter: function, *args) -> list:
+    '''Основная функция'''
     to_filter = {}
 
+    # собирает параметры фильтрации и их значения
     for param in selected_params['field_filter']:
         if not to_filter[param]:
             to_filter[param] = selected_params['field_filter'][param]
@@ -43,6 +47,7 @@ def query(collection: list, select: function, field_filter: function, *args) -> 
             to_filter[param] += selected_params['field_filter'][param]
 
     to_expose = []
+    # собирает друзей для вывода
     for fr in friends:
         fields = [i for i in fr if i in to_filter.keys()]
         add = True
@@ -52,6 +57,7 @@ def query(collection: list, select: function, field_filter: function, *args) -> 
         if add == True:
             to_expose.append(fr)
 
+    # фильтрует нужные поля и выводит
     print([{i: j for i, j in fri.items() if i in selected_params['select']} for fri in to_expose])
 
     return
