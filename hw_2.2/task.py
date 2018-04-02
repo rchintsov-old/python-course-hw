@@ -32,7 +32,7 @@ def field_filter(field_name: str, collection: list):
     pass
 
 
-def query(select, field_filter, collection):
+def query(collection: list, select: function, field_filter: function, *args) -> list:
     to_filter = {}
 
     for param in selected_params['field_filter']:
