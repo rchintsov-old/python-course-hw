@@ -1,6 +1,8 @@
+# Заводит переменную справочника
+catalog = {}
 
 def checked_input(values, type_, hello):
-    '''Проверяет ввод на принадлежность множеству правильных вариантов.'''
+    '''Проверяет ввод на принадлежность множеству правильных вариантов'''
     inp = type_(input(hello))
     if inp not in values:
         while inp not in values:
@@ -8,7 +10,6 @@ def checked_input(values, type_, hello):
             inp = type_(input(hello))
     return inp
 
-catalog = {}
 
 def add_number(name, number):
     '''Добавляет имя в справочник'''
