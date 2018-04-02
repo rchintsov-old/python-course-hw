@@ -27,6 +27,7 @@ def field_filter_wrapper(func):
 def select(field_name: list):
     pass
 
+
 @field_filter_wrapper
 def field_filter(field_name: str, collection: list):
     pass
@@ -54,4 +55,3 @@ def query(collection: list, select: function, field_filter: function, *args) -> 
     print([{i: j for i, j in fri.items() if i in selected_params['select']} for fri in to_expose])
 
     return
-
