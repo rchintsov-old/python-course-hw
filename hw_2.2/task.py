@@ -33,6 +33,25 @@ def field_filter(field_name: str, collection: list):
 
 
 def query(select, field_filter, collection):
-    pass
+    to_filter = {}
 
+    for param in selected_params['field_filter']:
+        if not to_filter[param]:
+            to_filter[param] = selected_params['field_filter'][param]
+        else:
+            to_filter[param] += selected_params['field_filter'][param]
+
+    to_expose = []
+    for fr in friends:
+        fields = [i for i in fr if i in to_filter.keys()]
+        add = True
+        for field in fields:
+            if fr[field] not in to_filter[field]:
+                add = False
+        if add == True:
+            to_expose.append(fr)
+
+    print([{i: j for i, j in fri.items() if i in selected_params['select']} for fri in to_expose])
+
+    return
 
