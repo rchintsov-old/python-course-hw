@@ -33,3 +33,7 @@ def set_pixel(pixel_values):
     :rtype: None
     '''
     print('Pixel created!')
+
+
+if __name__ == '__main__':
+    set_pixel([0, 1, 2])
