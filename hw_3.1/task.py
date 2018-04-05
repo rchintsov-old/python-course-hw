@@ -1,3 +1,4 @@
+import functools
 
 def fabric(fun_2):
     '''
@@ -8,8 +9,11 @@ def fabric(fun_2):
     '''
     def deco_main(fun_1):
         def deco_wrapper(f):
+            # задает последовательность вычислений оборачивающих функций
             wrapped = fun_2(fun_1(f))
+            @functools.wraps(f)
             def fun_wrapper(*args, **kwargs):
+               #  возвращает результат
                return wrapped(*args, **kwargs)
             return fun_wrapper
         return deco_wrapper
@@ -24,6 +28,7 @@ def lambda_executor(f):
     :return: функция
     :rtype: object
     '''
+    @functools.wraps(f)
     def wrapper():
         # здесь размещается лямбда
         return (lambda x: x**2)(f())
@@ -39,7 +44,9 @@ def repeat(times):
     '''
     @fabric(lambda_executor)
     def wrapper(f):
+        @functools.wraps(f)
         def inner(*args, **kwargs):
+            # собирает значения и считает среднее
             a = [f(*args, **kwargs) for i in range(times)]
             result = sum(a) / len(a)
             return result
