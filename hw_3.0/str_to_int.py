@@ -1,5 +1,6 @@
 def fun(string, result = 0):
     '''
+    Переводит строку в числовой вид.
 
     :param str string: строка для конвертации
     :param int result: служебный
@@ -19,6 +20,7 @@ def fun(string, result = 0):
         return fun(string[1:], result)
     else:
         return result
+
 
 if __name__ == '__main__':
     fun('abcd')
