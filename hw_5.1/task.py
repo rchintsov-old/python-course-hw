@@ -54,36 +54,35 @@ class Matrix:
 
     def __add__(self, x):
         # проверить на равенство размеров
-        if type(x) is Matrix:
-            flatten_x = self._flatten(x)
-            if len(flatten_x) == len(self._elements) and len(x) == len(self._matrix):
-
-                res = [i + j for i, j in zip(self._elements, flatten_x)]
-
-                return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
-
-            else:
-                raise TypeError("lenght of rows/cols doesn't match")
-        else:
+        if type(x) is not Matrix:
             raise TypeError('unsupported operand type for +: {}'.format(type(x)))
+
+        flatten_x = self._flatten(x)
+        if not len(flatten_x) == len(self._elements) \
+                and not len(x) == len(self._matrix):
+            raise TypeError("lenght of rows/cols doesn't match")
+
+        res = [i + j for i, j in zip(self._elements, flatten_x)]
+        return [list(itertools.islice(res, i, i + self._cols))
+                for i in range(0, len(res), self._cols)]
 
 
     def __sub__(self, x):
         # проверить на равенство размеров
-        if type(x) is Matrix:
-            flatten_x = self._flatten(x)
-            if len(flatten_x) == len(self._elements) and len(x) == len(self._matrix):
+        if type(x) is not Matrix:
+            raise TypeError("lenght of rows/cols doesn't match")
 
-                res = [i - j for i, j in zip(self._elements, flatten_x)]
-                return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
+        flatten_x = self._flatten(x)
+        if not len(flatten_x) == len(self._elements) \
+                and not len(x) == len(self._matrix):
+            raise TypeError("lenght of rows/cols doesn't match")
 
-            else:
-                raise TypeError("lenght of rows/cols doesn't match")
-        else:
-            raise TypeError('unsupported operand type for +: {}'.format(type(x)))
+        res = [i - j for i, j in zip(self._elements, flatten_x)]
+        return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
 
 
     def __mul__(self, x):
+
         if type(x) is int or float:
             return [[i * x for i in l] for l in self._matrix]
 
@@ -97,15 +96,33 @@ class Matrix:
 
             else:
                 raise TypeError("lenght of rows/cols doesn't match")
+
         else:
             raise TypeError('unsupported operand type for *: {}'.format(type(x)))
 
 
+    def is_equal(self, matrix):
+        if type(x) is not Matrix:
+            raise TypeError('unsupported operand type for comparison: {}'.format(type(matrix)))
+
+        flatten_x = self._flatten(matrix)
+        if len(flatten_x) == len(self._elements) and len(x) == len(self._matrix):
+            return True
+        else:
+            return False
+
+
+    def is_squared(self):
+        if self._rows == self._cols:
+            return True
+        else:
+            return False
 
 
 
 
-#
+
+
 # a = Matrix([[1, 1], [2,2]])
 # b = Matrix(1, 1)
 # # c = Matrix([[1, 1], [2,2]])
