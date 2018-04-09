@@ -55,7 +55,6 @@ class Matrix:
 
 
     def __add__(self, x):
-        # проверить на равенство размеров
         if not isinstance(x, Matrix):
             raise TypeError('unsupported operand type for +: {}'.format(type(x)))
 
@@ -70,7 +69,6 @@ class Matrix:
 
 
     def __sub__(self, x):
-        # проверить на равенство размеров
         if not isinstance(x, Matrix):
             raise TypeError("lenght of rows/cols doesn't match")
 
