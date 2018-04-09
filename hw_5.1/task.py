@@ -118,8 +118,18 @@ class Matrix:
         else:
             return False
 
+    def transpose(self):
+        return [[iterable[i] for iterable in self._matrix] for i in range(self._cols)]
 
 
+    def is_symmetric(self):
+        if not self.is_squared():
+            raise ValueError('matrix is not square')
+
+        if self._matrix == self.transpose():
+            return True
+        else:
+            return False
 
 
 
