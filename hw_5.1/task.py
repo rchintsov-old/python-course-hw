@@ -4,8 +4,8 @@ import random
 class Matrix:
     """
     Имплементация класа Matrix. При передаче в args 2-х чисел типа int конструирует матрицу из случайных чисел
-    заданного диапазона. При предаче списка списков.
-    Параметр self._random_bounds устанавливает границы генерации случайных чисел. По умолчанию: 0-100.
+    заданного диапазона. При предаче списка списков принимает их как основу для матрицы.
+    Внутренний параметр self._random_bounds устанавливает границы генерации случайных чисел (по умолчанию: 0-100).
 
     :param *args: параметры для конструкции класса.
     :type *args: int or list of lists
@@ -115,9 +115,11 @@ class Matrix:
                 and not len(x._matrix) == len(self._matrix):
             raise TypeError("length of rows/cols doesn't match")
 
+        # операция по элементам
         res = [i + j for i, j in zip(self._elements, flatten_x)]
-        return [list(itertools.islice(res, i, i + self._cols))
-                for i in range(0, len(res), self._cols)]
+        # операция сборки элементов в список списков на основе данных из self._cols и длины исходного массива
+        # слайсит исходный массив по range от 0 до длины массива (т.е. все элементы) с шагом = количеству столбцов
+        return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
 
 
     def __sub__(self, x):
@@ -145,7 +147,10 @@ class Matrix:
                 and not len(x._matrix) == len(self._matrix):
             raise TypeError("length of rows/cols doesn't match")
 
+        # операция по элементам
         res = [i - j for i, j in zip(self._elements, flatten_x)]
+        # операция сборки элементов в список списков на основе данных из self._cols и длины исходного массива
+        # слайсит исходный массив по range от 0 до длины массива (т.е. все элементы) с шагом = количеству столбцов
         return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
 
 
@@ -175,8 +180,11 @@ class Matrix:
             flatten_x = self._flatten(x._matrix)
             if len(flatten_x) == len(self._elements) and len(x._matrix) == len(self._matrix):
 
+                # операция по элементам
                 res = [i * j for i, j in zip(self._elements, flatten_x)]
 
+                # операция сборки элементов в список списков на основе данных из self._cols и длины исходного массива
+                # слайсит исходный массив по range от 0 до длины массива (т.е. все элементы) с шагом = количеству столбцов
                 return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
 
             else:
