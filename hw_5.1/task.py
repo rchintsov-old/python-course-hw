@@ -2,6 +2,16 @@ import itertools
 import random
 
 class Matrix:
+    """
+    Имплементация класа Matrix. При передаче в args 2-х чисел типа int конструирует матрицу из случайных чисел
+    заданного диапазона. При предаче списка списков.
+    Параметр self._random_bounds устанавливает границы генерации случайных чисел. По умолчанию: 0-100.
+
+    :param *args: параметры для конструкции класса.
+    :type *args: int or list of lists
+    :return: объект matrix.
+    :rtype: Matrix
+    """
     def __init__(self, *args):
         self._rows = 0
         self._cols = 0
@@ -12,7 +22,18 @@ class Matrix:
 
 
     def _check_arguments(self, args):
+        """
+        Проверяет аргументы конструктора класса.
 
+        :param *args: параметры для конструкции класса.
+        :type *args: int or list of lists
+        :return: args.
+        :rtype: list or tuple
+        :raises ValueError: если переданы несколько разных типов.
+        :raises ValueError: если передано только 1 число вместо 2-х.
+        :raises ValueError: если в списке списков содержится только 1 элемент.
+        :raises ValueError: если переданы иные неподходящие элементы.
+        """
         if len(set([type(i) for i in args])) is not 1:
             print(set([type(i) for i in args]))
             raise ValueError('types is not matching')
@@ -36,6 +57,14 @@ class Matrix:
 
 
     def _create_matrix(self):
+        """
+        Создает матрицу из аргументов self._args.
+
+        :param self._args: внутренний аргемент класса
+        :type _name: list or tuple
+        :return: list of lists.
+        :rtype: list
+        """
         if type(self._args) is tuple:
 
             self._cols, self._rows = self._args
@@ -51,17 +80,40 @@ class Matrix:
 
 
     def _flatten(self, list_):
+        """
+        Делает список плоским.
+
+        :param list list_: список для преобразования.
+        :return: flatten list.
+        :rtype: list
+        """
         return [a for b in list_ for a in b]
 
 
     def __add__(self, x):
+        """
+        Перегрузка оператора сложения.
+
+        :param Matrix x: матрица с которой складывать.
+        :return: результат сложения.
+        :rtype: list of lists
+        :raises TypeError: if unsupported operand type for + (передана не матрица).
+        :raises TypeError: if length of rows/cols doesn't match.
+
+        :Example:
+
+        >>> b = Matrix([[1, 1], [2, 2]])
+        >>> e = Matrix([[3, 3], [4, 4]])
+        >>> print(b + e)
+        # [[4, 4], [6, 6]]
+        """
         if not isinstance(x, Matrix):
             raise TypeError('unsupported operand type for +: {}'.format(type(x)))
 
         flatten_x = self._flatten(x._matrix)
         if not len(flatten_x) == len(self._elements) \
                 and not len(x._matrix) == len(self._matrix):
-            raise TypeError("lenght of rows/cols doesn't match")
+            raise TypeError("length of rows/cols doesn't match")
 
         res = [i + j for i, j in zip(self._elements, flatten_x)]
         return [list(itertools.islice(res, i, i + self._cols))
@@ -69,20 +121,52 @@ class Matrix:
 
 
     def __sub__(self, x):
+        """
+        Перегрузка оператора вычитания.
+
+        :param Matrix x: матрица, которую вычитать.
+        :return: результат вычитания.
+        :rtype: list of lists
+        :raises TypeError: if unsupported operand type for - (передана не матрица).
+        :raises TypeError: if length of rows/cols doesn't match.
+
+        :Example:
+
+        >>> b = Matrix([[1, 1], [2, 2]])
+        >>> e = Matrix([[3, 3], [4, 4]])
+        >>> print(e - b)
+        # [[2, 2], [2, 2]]
+        """
         if not isinstance(x, Matrix):
-            raise TypeError("lenght of rows/cols doesn't match")
+            raise TypeError('unsupported operand type for -: {}'.format(type(x)))
 
         flatten_x = self._flatten(x._matrix)
         if not len(flatten_x) == len(self._elements) \
                 and not len(x._matrix) == len(self._matrix):
-            raise TypeError("lenght of rows/cols doesn't match")
+            raise TypeError("length of rows/cols doesn't match")
 
         res = [i - j for i, j in zip(self._elements, flatten_x)]
         return [list(itertools.islice(res, i, i + self._cols)) for i in range(0, len(res), self._cols)]
 
 
     def __mul__(self, x):
+        """
+        Перегрузка оператора умножения. Умножает на другую матрицу и на скаляр.
 
+        :param x: матрица, которую вычитать.
+        :type x: Matrix or int or float
+        :return: результат умножения.
+        :rtype: list of lists
+        :raises TypeError: if unsupported operand type for * (передана не матрица и не скаляр).
+        :raises TypeError: if length of rows/cols doesn't match (при перемножении 2-х матриц).
+
+        :Example:
+
+        >>> b = Matrix([[1, 1], [2, 2]])
+        >>> e = Matrix([[3, 3], [4, 4]])
+        >>> print(b * e)
+        # [[3, 3], [8, 8]]
+        """
         if isinstance(x, (int, float)):
             print(2)
             return [[i * x for i in l] for l in self._matrix]
@@ -104,6 +188,21 @@ class Matrix:
 
 
     def is_equal(self, matrix):
+        """
+        Сравнение матриц на эквивалентность.
+
+        :param Matrix matrix: матрица, с которой происходит сравнение.
+        :return: True or False.
+        :rtype: bool
+        :raises TypeError: if unsupported operand type for comparison (передана не матрица).
+
+        :Example:
+
+        >>> g = Matrix([[1,2,3], [2,1,2], [3,2,1]])
+        >>> j = Matrix([[1,2,3], [2,1,2], [3,2,1]])
+        >>> g.is_equal(j)
+        # True
+        """
         if not isinstance(matrix, Matrix):
             raise TypeError('unsupported operand type for comparison: {}'.format(type(matrix)))
 
@@ -114,6 +213,18 @@ class Matrix:
 
 
     def is_squared(self):
+        """
+        Проверка матрицы на квадратность. Сравнивает внутренние параметры self._rows и self._cols.
+
+        :return: True or False.
+        :rtype: bool
+
+        :Example:
+
+        >>> g = Matrix([[1,2,3], [2,1,2], [3,2,1]])
+        >>> g.is_squared(j)
+        # True
+        """
         if self._rows == self._cols:
             return True
         else:
@@ -121,10 +232,35 @@ class Matrix:
 
 
     def transpose(self):
+        """
+        Транспонирование матрицы. Берет внутренний параметр self._matrix.
+
+        :return: True or False.
+        :rtype: bool
+
+        :Example:
+
+        >>> g = Matrix([[1,2,3], [2,1,2], [3,2,1]])
+        >>> g.transpose()
+        # [[1, 2, 3], [2, 1, 2], [3, 2, 1]]
+        """
         return [[iterable[i] for iterable in self._matrix] for i in range(self._cols)]
 
 
     def is_symmetric(self):
+        """
+        Проверка матрицы на симметричность. Транспонирует self._matrix и сравнивает с собой.
+
+        :return: True or False.
+        :rtype: bool
+        :raises ValueError: if matrix is not squared
+
+        :Example:
+
+        >>> g = Matrix([[1,2,3], [2,1,2], [3,2,1]])
+        >>> g.is_symmetric(j)
+        # True
+        """
         if not self.is_squared():
             raise ValueError('matrix is not squared')
 
