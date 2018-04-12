@@ -79,3 +79,5 @@ if __name__ == '__main__':
 
     print(b.price)
     print(c.price)
+
+    b.price = -24
