@@ -27,6 +27,9 @@ class Logger:
 
 
     def __enter__(self):
+        """
+        Сохраняет время начала выполнения кода.
+        """
         self.start = time.time()
         return self
 
@@ -36,19 +39,18 @@ class Logger:
         Если ошибка происходит, принимает параметры ошибки.
         Сохраняет их в файл + время ошибки + время выполнения кода.
         
-        :param class exc_type: класс ошибки.
-        :param Error exc_val: детали ошибки.
+        :param class exc_type: инстанс ошибки.
+        :param str exc_val: детали ошибки.
         :return: файл.
         :rtype: file
         """
-
         if exc_type:
             execution_time = time.time() - self.start
             with open(self.filename, 'a') as f:
-                f.write('{time} | {error}: {args} | {execution}'.format(
+                f.write('{time} | {error}: {details} | {execution}'.format(
                     time = datetime.fromtimestamp(execution_time).strftime("%c"),
                     error = exc_type.__name__,
-                    args = exc_val,
+                    details = exc_val,
                     execution = execution_time
                 ))
 
