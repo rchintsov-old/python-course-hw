@@ -1,7 +1,12 @@
-# задача: написать тулзу, которая считает площадь треугольника по 3м точкам
+"""
+Программа для рассчета площади треугольника по местоположению углов.
 
-# ввод: () или [] типа (2, 1)
-# проверка, что все точки не на одной линии
+:Example:
+
+>>> match_S(*get_sides([3, 2], [5, 5], [0, 8]))
+10.500000000000002
+"""
+
 
 from numpy import sqrt, mean
 
@@ -25,10 +30,8 @@ def match_c(a, b):
 
     :Example:
 
-    >>>
-    #
-    >>>
-    #
+    >>> match_c(2, 3)
+    3.605551275463989
     """
     return sqrt(a ** 2 + b ** 2)
 
@@ -48,10 +51,8 @@ def get_sides(point1, point2, point3):
 
     :Example:
 
-    >>>
-    #
-    >>>
-    #
+    >>> get_sides([3, 2], [5, 5], [10, 2])
+    (3.605551275463989, 5.830951894845301, 7.0)
     """
     # 1. попарное вычитание одной координаты из лругой по каждой из осей
     # 2. получение сторон для "служебного" треугольника, у которого гипотенуза
@@ -78,20 +79,18 @@ def match_S(a, b, c):
 
     :Example:
 
-    >>>
-    #
-    >>>
-    #
+    >>> match_S(3.605551275463989, 5.830951894845301, 7.0)
+    10.500000000000002
     """
     p = (a + b + c) / 2
     return sqrt(p * (p - a) * (p - b) * (p - c))
 
 assert match_S(*get_sides(point1, point2, point3)) == S
-assert match_S(*get_sides(point1, point2, point3)) == match_S(*get_sides(point1, point2, [0, 8]))
+assert match_S(*get_sides(point1, point2, point3)) == \
+       match_S(*get_sides(point1, point2, [0, 8]))
 
 
-
-def get_points():
+def get_points(inp1='', inp2='', inp3='', test=False):
     """
     Принимает и проверяет ввод пользователя, возвращает координаты углов.
     Если пользователь дает неверный ввод, пишет в консоль где ошибка.
@@ -102,19 +101,20 @@ def get_points():
 
     :Example:
 
-    >>>
-    #
-    >>>
-    #
+    >>> get_points('3 2', '5 5', '10 2', test=True)
+    Введите точки углов треугольника в виде координат на осях X и Y.
+    На каждый угол введите по 2 координаты через пробел.
+    [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]]
     """
     print('Введите точки углов треугольника в виде координат на осях X и Y.')
     print('На каждый угол введите по 2 координаты через пробел.')
 
     while True:
 
-        inp1 = input('Угол 1 > ')
-        inp2 = input('Угол 2 > ')
-        inp3 = input('Угол 3 > ')
+        if not test:
+            inp1 = input('Угол 1 > ')
+            inp2 = input('Угол 2 > ')
+            inp3 = input('Угол 3 > ')
 
         points = []
 
@@ -146,4 +146,7 @@ def get_points():
 
 if __name__ == '__main__':
 
-    print('S =', match_S(*get_sides(*get_points())))
+    import doctest
+    doctest.testmod()
+
+    # print('S =', match_S(*get_sides(*get_points())))
