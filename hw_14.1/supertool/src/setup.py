@@ -33,10 +33,11 @@ setup (
     packages=find_packages(exclude=['tests']),
     install_requires=extract_requirements(os.path.join(DISTRO_ROOT_PATCH, 'requirements', 'base.txt')),
     test_requires=extract_requirements(os.path.join(DISTRO_ROOT_PATCH, 'requirements', 'test.txt')),
+    # переписать кусок кода с начала до bina
     test_suite='nose.collector',
-    # scripts=[os.path.join('bin', 'similar_files')]
+    # scripts=['bin.similar_files']
     # scripts не работает на моей системе (ubuntu), использую bin
-    bin=[os.path.join('bin', 'similar_files')]
+    bin=[os.path.join('bin', 'similar_files'), os.path.join('bin', 'weather_forecast')]
 )
 
 

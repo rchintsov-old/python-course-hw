@@ -15,3 +15,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     weather.get()
+
+
+.gitignore - скачать репозиторий и он только диффы увидит
