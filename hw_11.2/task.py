@@ -18,10 +18,8 @@ class InputError(Exception):
     :rtype: class instance
     """
     def __init__(self, message=''):
-       if message:
-           Exception.__init__(self, message)
-       else:
-           Exception.__init__(self)
+       Exception.__init__(self, message)
+
 
 
 # --------------------------------------------------
@@ -105,6 +103,41 @@ assert match_S(*get_sides(point1, point2, point3)) == \
        match_S(*get_sides(point1, point2, [0, 8]))
 
 
+def fake_input(str_):
+    """
+    For testing input with doctest.
+
+    :param str str_: строка для вывода в консоль.
+    :return: 1.
+    :rtype: int
+
+    :Example:
+
+    >>> fake_input('some string')
+    1
+    """
+    return 1
+
+
+def get_input(input_func=input):
+    """
+    Принимает ввод пользователя.
+
+    :return: координаты углов [point_1, point_2, point_3].
+    :rtype: list of strings
+
+    :Example:
+
+    >>> get_input(fake_input)
+    (1, 1, 1)
+    """
+    inp1 = input_func('Угол 1 > ')
+    inp2 = input_func('Угол 2 > ')
+    inp3 = input_func('Угол 3 > ')
+    return inp1, inp2, inp3
+
+
+
 def get_points(inp1='', inp2='', inp3='', test=False):
     """
     Принимает и проверяет ввод пользователя, возвращает координаты углов.
@@ -139,9 +172,7 @@ def get_points(inp1='', inp2='', inp3='', test=False):
     while True:
 
         if not test:
-            inp1 = input('Угол 1 > ')
-            inp2 = input('Угол 2 > ')
-            inp3 = input('Угол 3 > ')
+            inp1, inp2, inp3 = get_input()
 
         points = []
 
