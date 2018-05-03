@@ -7,6 +7,9 @@
 10.500000000000002
 """
 from numpy import sqrt, mean
+import doctest
+from unittest.mock import patch
+import unittest
 
 
 class InputError(Exception):
@@ -19,17 +22,6 @@ class InputError(Exception):
     """
     def __init__(self, message=''):
        Exception.__init__(self, message)
-
-
-
-# --------------------------------------------------
-point1 = [3,2]
-point2 = [5,5]
-point3 = [10,2]
-
-a, b, c = 3.605551275463989, 5.830951894845301, 7
-S = 10.500000000000002
-# --------------------------------------------------
 
 
 def match_c(a, b):
@@ -48,7 +40,7 @@ def match_c(a, b):
     """
     return sqrt(a ** 2 + b ** 2)
 
-assert match_c(2, 3) == a
+assert match_c(2, 3) == 3.605551275463989
 
 
 def get_sides(point1, point2, point3):
@@ -77,7 +69,8 @@ def get_sides(point1, point2, point3):
 
     return a, b, c
 
-assert get_sides(point1, point2, point3) == (a, b, c)
+assert get_sides([3, 2], [5, 5], [10, 2]) == \
+       (3.605551275463989, 5.830951894845301, 7)
 
 
 def match_S(a, b, c):
@@ -98,9 +91,10 @@ def match_S(a, b, c):
     p = (a + b + c) / 2
     return sqrt(p * (p - a) * (p - b) * (p - c))
 
-assert match_S(*get_sides(point1, point2, point3)) == S
-assert match_S(*get_sides(point1, point2, point3)) == \
-       match_S(*get_sides(point1, point2, [0, 8]))
+assert match_S(*get_sides([3, 2], [5, 5], [10, 2])) == \
+       10.500000000000002
+assert match_S(*get_sides([3, 2], [5, 5], [10, 2])) == \
+       match_S(*get_sides([3, 2], [5, 5], [0, 8]))
 
 
 def fake_input(str_):
@@ -135,6 +129,8 @@ def get_input(input_func=input):
     inp2 = input_func('Угол 2 > ')
     inp3 = input_func('Угол 3 > ')
     return inp1, inp2, inp3
+
+assert get_input(fake_input) == (1, 1, 1)
 
 
 
@@ -212,10 +208,97 @@ def get_points(inp1='', inp2='', inp3='', test=False):
             return points
 
 
+class TestMatchC(unittest.TestCase):
+
+    def test_match_c_with_2_and_3_positive(self):
+        self.assertEqual(match_c(2, 3), 3.605551275463989, 'Wrong answer')
+
+
+    def test_match_c_with_2_and_3_negative(self):
+        self.assertNotEqual(match_c(2, 3), 6, 'Wrong answer')
+
+
+class TestGetSides(unittest.TestCase):
+
+    def test_get_sides_with_test_points_positive(self):
+        self.assertEqual(get_sides([3, 2], [5, 5], [10, 2]),
+                         (3.605551275463989, 5.830951894845301, 7.0),
+                         'Wrong answer')
+
+
+    def test_get_sides_returns_strings_positive(self):
+        self.assertIsInstance(get_sides([3, 2], [5, 5], [10, 2]), tuple,
+                              'Wrong type')
+
+
+class TestMathS(unittest.TestCase):
+
+    def test_match_S_with_abc_positive(self):
+        self.assertEqual(match_S(3.605551275463989, 5.830951894845301, 7.0),
+                         10.500000000000002, 'Wrong answer')
+
+
+    def test_match_S_int_positive(self):
+        self.assertIsInstance(match_S(3.605551275463989, 5.830951894845301, 7.0),
+                              float, 'Wrong type')
+
+
+class TestFakeInput(unittest.TestCase):
+
+    def test_fake_input_positive(self):
+        self.assertEqual(fake_input('some string'), 1, 'Not worked')
+
+
+class TestGetInput(unittest.TestCase):
+
+    def test_get_input__positive(self):
+        self.assertEqual(get_input(fake_input), (1, 1, 1), 'Wrong answer')
+
+
+    def test_get_input_type_negative(self):
+        self.assertNotIsInstance(get_input(fake_input), list, 'Wrong type')
+
+
+class TestGetPoints(unittest.TestCase):
+
+    def test_get_points_with_test_points_positive(self):
+        self.assertEqual(get_points('3 2', '5 5', '10 2', test=True),
+                         [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]], 'Wrong answer')
+
+
+    # тестирование исключения InputError: 2 coordinates needed
+    def test_get_points_2_coord_needed_exception(self):
+        with self.assertRaises(InputError) as raised_exception:
+            get_points('3', '5 5', '10 2', test=True)
+
+        self.assertEqual(raised_exception.exception.args[0],
+                         "2 coordinates needed")
+
+
+    # тестирование исключения InputError: not numbers
+    def test_get_points_not_numbers_exception(self):
+        with self.assertRaises(InputError) as raised_exception:
+            get_points('a b', '5 5', '10 2', test=True)
+
+        self.assertEqual(raised_exception.exception.args[0],
+                         "not numbers")
+
+
+    # тестирование исключения InputError: all points are on the straight line
+    def test_get_points_on_straight_line_exception(self):
+        with self.assertRaises(InputError) as raised_exception:
+            get_points('5 4', '5 5', '5 2', test=True)
+
+        self.assertEqual(raised_exception.exception.args[0],
+                         "all points are on the straight line")
+
+
+
 
 if __name__ == '__main__':
 
-    import doctest
     doctest.testmod()
 
-    # print('S =', match_S(*get_sides(*get_points())))
+    unittest.main()
+
+    print('S =', match_S(*get_sides(*get_points())))
