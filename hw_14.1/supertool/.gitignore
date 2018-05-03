@@ -1,0 +1,10 @@
+src/.eggs/
+src/build/
+src/dist/
+src/supertool_distro.egg-info/
+venv1/
+__pycache__/
+.idea/
+../../hw_11.2/test_mock.py
+../../hw_11.2/test_mock_simple.py
+../../hw_11.2/test_stdout.py
