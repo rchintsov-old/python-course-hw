@@ -6,9 +6,23 @@
 >>> match_S(*get_sides([3, 2], [5, 5], [0, 8]))
 10.500000000000002
 """
-
-
 from numpy import sqrt, mean
+
+
+class InputError(Exception):
+    """
+    Inappropriate input.
+
+    :param str message: error explanation (optional).
+    :return: InputError.
+    :rtype: class instance
+    """
+    def __init__(self, message=''):
+       if message:
+           Exception.__init__(self, message)
+       else:
+           Exception.__init__(self)
+
 
 # --------------------------------------------------
 point1 = [3,2]
@@ -18,6 +32,7 @@ point3 = [10,2]
 a, b, c = 3.605551275463989, 5.830951894845301, 7
 S = 10.500000000000002
 # --------------------------------------------------
+
 
 def match_c(a, b):
     """
@@ -105,6 +120,18 @@ def get_points(inp1='', inp2='', inp3='', test=False):
     Введите точки углов треугольника в виде координат на осях X и Y.
     На каждый угол введите по 2 координаты через пробел.
     [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]]
+    >>> get_points('3', '5 5', '10 2', test=True)
+    Traceback (most recent call last):
+    ...
+    InputError: 2 coordinates needed
+    >>> get_points('a b', '5 5', '10 2', test=True)
+    Traceback (most recent call last):
+    ...
+    InputError: not numbers
+    >>> get_points('5 4', '5 5', '5 2', test=True)
+    Traceback (most recent call last):
+    ...
+    InputError: all points are on the straight line
     """
     print('Введите точки углов треугольника в виде координат на осях X и Y.')
     print('На каждый угол введите по 2 координаты через пробел.')
@@ -124,21 +151,32 @@ def get_points(inp1='', inp2='', inp3='', test=False):
             if len(inp.split()) != 2:
                 print('Нужно ввести по 2 координаты на каждый угол (вы ввели {}). '
                       'Попробуйте снова.'.format(len(inp.split())))
-                break
+
+                if not test:
+                    break
+                else:
+                    raise InputError("2 coordinates needed")
 
             # проверка на числа
             try:
                 points.append([float(i) for i in inp.split()])
             except ValueError:
                 print('Вы ввели не числа: "{}". Попробуйте снова.'.format(inp))
-                break
+
+                if not test:
+                    break
+                else:
+                    raise InputError("not numbers")
 
         else:
             # проверка на то, что координаты не лежат на одной прямой
             if mean([i[0] for i in points]) == points[0][0] or \
                 mean([i[1] for i in points]) == points[0][1]:
                 print('Введенные точки находятся на одной прямой, попробуйте снова.')
-                continue
+                if not test:
+                    continue
+                else:
+                    raise InputError('all points are on the straight line')
 
             return points
 
