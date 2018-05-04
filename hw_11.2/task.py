@@ -6,22 +6,13 @@
 >>> match_S(*get_sides([3, 2], [5, 5], [0, 8]))
 10.500000000000002
 """
-from numpy import sqrt, mean
 import doctest
-from unittest.mock import patch
+import io
 import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
 
-
-class InputError(Exception):
-    """
-    Inappropriate input.
-
-    :param str message: error explanation (optional).
-    :return: InputError.
-    :rtype: class instance
-    """
-    def __init__(self, message=''):
-       Exception.__init__(self, message)
+from numpy import sqrt, mean
 
 
 def match_c(a, b):
@@ -97,78 +88,22 @@ assert match_S(*get_sides([3, 2], [5, 5], [10, 2])) == \
        match_S(*get_sides([3, 2], [5, 5], [0, 8]))
 
 
-def fake_input(str_):
-    """
-    For testing input with doctest.
-
-    :param str str_: строка для вывода в консоль.
-    :return: 1.
-    :rtype: int
-
-    :Example:
-
-    >>> fake_input('some string')
-    1
-    """
-    return 1
-
-
-def get_input(input_func=input):
-    """
-    Принимает ввод пользователя.
-
-    :return: координаты углов [point_1, point_2, point_3].
-    :rtype: list of strings
-
-    :Example:
-
-    >>> get_input(fake_input)
-    (1, 1, 1)
-    """
-    inp1 = input_func('Угол 1 > ')
-    inp2 = input_func('Угол 2 > ')
-    inp3 = input_func('Угол 3 > ')
-    return inp1, inp2, inp3
-
-assert get_input(fake_input) == (1, 1, 1)
-
-
-
-def get_points(inp1='', inp2='', inp3='', test=False):
+def get_points():
     """
     Принимает и проверяет ввод пользователя, возвращает координаты углов.
     Если пользователь дает неверный ввод, пишет в консоль где ошибка.
 
     :return: координаты углов во вложенных списках вида [[x, y], [x, y], [x, y]].
-    :rtype: list
-    :exception ValueError: когда пользователь вводит не числа (перехватывается).
-
-    :Example:
-
-    >>> get_points('3 2', '5 5', '10 2', test=True)
-    Введите точки углов треугольника в виде координат на осях X и Y.
-    На каждый угол введите по 2 координаты через пробел.
-    [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]]
-    >>> get_points('3', '5 5', '10 2', test=True)
-    Traceback (most recent call last):
-    ...
-    InputError: 2 coordinates needed
-    >>> get_points('a b', '5 5', '10 2', test=True)
-    Traceback (most recent call last):
-    ...
-    InputError: not numbers
-    >>> get_points('5 4', '5 5', '5 2', test=True)
-    Traceback (most recent call last):
-    ...
-    InputError: all points are on the straight line
+    :rtype: list of lists
     """
     print('Введите точки углов треугольника в виде координат на осях X и Y.')
     print('На каждый угол введите по 2 координаты через пробел.')
 
     while True:
 
-        if not test:
-            inp1, inp2, inp3 = get_input()
+        inp1 = input('Угол 1 > ')
+        inp2 = input('Угол 2 > ')
+        inp3 = input('Угол 3 > ')
 
         points = []
 
@@ -178,32 +113,21 @@ def get_points(inp1='', inp2='', inp3='', test=False):
             if len(inp.split()) != 2:
                 print('Нужно ввести по 2 координаты на каждый угол (вы ввели {}). '
                       'Попробуйте снова.'.format(len(inp.split())))
-
-                if not test:
-                    break
-                else:
-                    raise InputError("2 coordinates needed")
+                break
 
             # проверка на числа
             try:
                 points.append([float(i) for i in inp.split()])
             except ValueError:
                 print('Вы ввели не числа: "{}". Попробуйте снова.'.format(inp))
-
-                if not test:
-                    break
-                else:
-                    raise InputError("not numbers")
+                break
 
         else:
             # проверка на то, что координаты не лежат на одной прямой
             if mean([i[0] for i in points]) == points[0][0] or \
                 mean([i[1] for i in points]) == points[0][1]:
                 print('Введенные точки находятся на одной прямой, попробуйте снова.')
-                if not test:
-                    continue
-                else:
-                    raise InputError('all points are on the straight line')
+                continue
 
             return points
 
@@ -211,11 +135,13 @@ def get_points(inp1='', inp2='', inp3='', test=False):
 class TestMatchC(unittest.TestCase):
 
     def test_match_c_with_2_and_3_positive(self):
-        self.assertEqual(match_c(2, 3), 3.605551275463989, 'Wrong answer')
+        self.assertEqual(match_c(2, 3), 3.605551275463989,
+                         'Wrong hypotenuse len')
 
 
     def test_match_c_with_2_and_3_negative(self):
-        self.assertNotEqual(match_c(2, 3), 6, 'Wrong answer')
+        self.assertIsInstance(match_c(2, 3), float,
+                              'Wrong type of hypotenuse len')
 
 
 class TestGetSides(unittest.TestCase):
@@ -223,76 +149,108 @@ class TestGetSides(unittest.TestCase):
     def test_get_sides_with_test_points_positive(self):
         self.assertEqual(get_sides([3, 2], [5, 5], [10, 2]),
                          (3.605551275463989, 5.830951894845301, 7.0),
-                         'Wrong answer')
+                         'Wrong sides answer')
 
 
     def test_get_sides_returns_strings_positive(self):
         self.assertIsInstance(get_sides([3, 2], [5, 5], [10, 2]), tuple,
-                              'Wrong type')
+                              'Wrong sides type')
 
 
 class TestMathS(unittest.TestCase):
 
     def test_match_S_with_abc_positive(self):
         self.assertEqual(match_S(3.605551275463989, 5.830951894845301, 7.0),
-                         10.500000000000002, 'Wrong answer')
+                         10.500000000000002, 'Wrong S')
 
 
     def test_match_S_int_positive(self):
         self.assertIsInstance(match_S(3.605551275463989, 5.830951894845301, 7.0),
-                              float, 'Wrong type')
-
-
-class TestFakeInput(unittest.TestCase):
-
-    def test_fake_input_positive(self):
-        self.assertEqual(fake_input('some string'), 1, 'Not worked')
-
-
-class TestGetInput(unittest.TestCase):
-
-    def test_get_input__positive(self):
-        self.assertEqual(get_input(fake_input), (1, 1, 1), 'Wrong answer')
-
-
-    def test_get_input_type_negative(self):
-        self.assertNotIsInstance(get_input(fake_input), list, 'Wrong type')
+                              float, 'Wrong S type')
 
 
 class TestGetPoints(unittest.TestCase):
 
-    def test_get_points_with_test_points_positive(self):
-        self.assertEqual(get_points('3 2', '5 5', '10 2', test=True),
-                         [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]], 'Wrong answer')
+    def test_with_sample_points_positive(self):
+
+        user_input = ['3 2', '5 5', '10 2']  # positive
+
+        expected_points = [[3.0, 2.0], [5.0, 5.0], [10.0, 2.0]]
+        expected_stdout = 'Введите точки углов треугольника в виде ' \
+                          'координат на осях X и Y.\nНа каждый угол ' \
+                          'введите по 2 координаты через пробел.\n'
+
+        stdout_handler = io.StringIO()
+        with patch('builtins.input', side_effect=user_input), \
+             redirect_stdout(stdout_handler):
+            points = get_points()
+
+        got_stdout = stdout_handler.getvalue()
+
+        self.assertEqual(points, expected_points, 'Wrong points')
+        self.assertEqual(got_stdout, expected_stdout, 'Wrong stdout')
 
 
-    # тестирование исключения InputError: 2 coordinates needed
-    def test_get_points_2_coord_needed_exception(self):
-        with self.assertRaises(InputError) as raised_exception:
-            get_points('3', '5 5', '10 2', test=True)
+    def test_without_1_coordinate_negaive(self):
 
-        self.assertEqual(raised_exception.exception.args[0],
-                         "2 coordinates needed")
+        user_input = [
+            '3', '5 5', '10 2',   # negative
+            '3 2', '5 5', '10 2'
+        ]
+        expected_stdout = 'Введите точки углов треугольника в виде ' \
+                          'координат на осях X и Y.\nНа каждый угол ' \
+                          'введите по 2 координаты через пробел.\nНужно ' \
+                          'ввести по 2 координаты на каждый угол ' \
+                          '(вы ввели 1). Попробуйте снова.\n'
 
+        stdout_handler = io.StringIO()
+        with patch('builtins.input', side_effect=user_input), \
+             redirect_stdout(stdout_handler):
+            points = get_points()
 
-    # тестирование исключения InputError: not numbers
-    def test_get_points_not_numbers_exception(self):
-        with self.assertRaises(InputError) as raised_exception:
-            get_points('a b', '5 5', '10 2', test=True)
-
-        self.assertEqual(raised_exception.exception.args[0],
-                         "not numbers")
-
-
-    # тестирование исключения InputError: all points are on the straight line
-    def test_get_points_on_straight_line_exception(self):
-        with self.assertRaises(InputError) as raised_exception:
-            get_points('5 4', '5 5', '5 2', test=True)
-
-        self.assertEqual(raised_exception.exception.args[0],
-                         "all points are on the straight line")
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(got_stdout, expected_stdout, 'Wrong stdout')
 
 
+    def test_with_not_number_input_negative(self):
+
+        user_input = [
+            'a b', '5 5', '10 2',  # negative
+            '3 2', '5 5', '10 2'
+        ]
+        expected_stdout = 'Введите точки углов треугольника в виде ' \
+                          'координат на осях X и Y.\nНа каждый угол ' \
+                          'введите по 2 координаты через пробел.\nВы ' \
+                          'ввели не числа: "a b". Попробуйте снова.\n'
+
+        stdout_handler = io.StringIO()
+        with patch('builtins.input', side_effect=user_input), \
+             redirect_stdout(stdout_handler):
+            points = get_points()
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(got_stdout, expected_stdout, 'Wrong stdout')
+
+
+    def test_with_points_on_straight_line_negative(self):
+
+        user_input = [
+            '5 4', '5 5', '5 2',   # negative
+            '3 2', '5 5', '10 2'
+        ]
+        expected_stdout = 'Введите точки углов треугольника в виде ' \
+                          'координат на осях X и Y.\nНа каждый угол ' \
+                          'введите по 2 координаты через пробел.' \
+                          '\nВведенные точки находятся на одной прямой, ' \
+                          'попробуйте снова.\n'
+
+        stdout_handler = io.StringIO()
+        with patch('builtins.input', side_effect=user_input), \
+             redirect_stdout(stdout_handler):
+            points = get_points()
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(got_stdout, expected_stdout, 'Wrong stdout')
 
 
 if __name__ == '__main__':
