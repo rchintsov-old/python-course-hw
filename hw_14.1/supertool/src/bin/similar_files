@@ -16,7 +16,7 @@ ROOT_LOGGER = logging.getLogger()
 
 
 if __name__ == '__main__':
-    print('Hello')
+
     parser = argparse.ArgumentParser(description='Find similar files')
     # parser.add_argument('--target--directory', type=str, default='', help='target directory')
     parser.add_argument('directory', type=str, help='target directory')
@@ -32,11 +32,11 @@ if __name__ == '__main__':
         log_level = logging.ERROR
 
     ROOT_LOGGER.setLevel(log_level)
-
-    ROOT_LOGGER.info('I am info message')
-    ROOT_LOGGER.critical('I am critical message')
-
-    print(ROOT_LOGGER.level)
+    #
+    # ROOT_LOGGER.info('I am info message')
+    # ROOT_LOGGER.critical('I am critical message')
+    #
+    # print(ROOT_LOGGER.level)
 
     # print('I have been invoked with: {}'.format(args.target__directory))
-    print('I have been invoked with: {}'.format(args.directory))
+    # print('I have been invoked with: {}'.format(args.directory))
