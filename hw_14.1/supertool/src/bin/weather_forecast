@@ -8,12 +8,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Weather forecast for specified city.')
 
-    parser.add_argument('city', type=str, help='City where need to show weather.')
-    parser.add_argument('--token', type=str, help='API token', default='')
-    parser.add_argument('--street', metavar='STREET', type=str,
-                    help='Street', default='')
-    parser.add_argument('--house', metavar='HOUSENUM', type=str,
-                    help='House number', default='')
+    parser.add_argument('city', type=str, metavar='CITY', help='City where need to show weather.')
+    parser.add_argument('--token', metavar='TOKEN', type=str, help='API token', default='')
+    parser.add_argument('--street', metavar='STREET', type=str, help='Street', default='')
+    parser.add_argument('--house', metavar='HOUSENUM', type=str, help='House number', default='')
 
     args = parser.parse_args()
 

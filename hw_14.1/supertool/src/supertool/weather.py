@@ -5,36 +5,6 @@ import numpy as np
 import sys
 
 
-# def get_adress():
-#     while True:
-#
-#         city = input('Введите город > ')
-#         try:
-#             float(city)
-#             print('Неверный ввод, попробуйте еще раз.')
-#             continue
-#         except ValueError:
-#             pass
-#
-#         street = input('Введите улицу (опционально) > ')
-#         try:
-#             float(street)
-#             print('Неверный ввод, попробуйте еще раз.')
-#             continue
-#         except ValueError:
-#             pass
-#
-#         house = input('Введите дом (опционально) > ')
-#         try:
-#             house = int(house)
-#         except ValueError:
-#             print('Неверный ввод, попробуйте еще раз.')
-#             continue
-#
-#         return city, street, house
-
-
-
 def get_coordinates(city, street, house):
 
     url = "http://nominatim.openstreetmap.org/search"
