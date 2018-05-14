@@ -2,18 +2,29 @@
 
 import argparse
 
-from supertool import weather
+from ..supertool import weather as w
 
 if __name__ == '__main__':
 
-    print('')
-    parser = argparse.ArgumentParser(description='Weather forecast')
+    parser = argparse.ArgumentParser(description='Weather forecast for specified city.')
 
-    parser.add_argument('city', type=str, help='City')
-    parser.add_argument('token', type=str, help='API token')
+    parser.add_argument('city', type=str, help='City where need to show weather.')
+    parser.add_argument('--token', type=str, help='API token', default='')
+    parser.add_argument('--street', metavar='STREET', type=str,
+                    help='Street', default='')
+    parser.add_argument('--house', metavar='HOUSENUM', type=str,
+                    help='House number', default='')
 
     args = parser.parse_args()
 
-    weather.get()
+    if args.token:
+        test = False
+    else:
+        test = True
 
+    coord_dict = w.get_coordinates(args.city, args.street, args.house)
+    json_answer = w.get_weather(coord_dict, token=args.token, test=test)
+    five_days, current_day, city = w.prepare_forecast(json_answer)
+
+    w.print_weather(five_days, current_day, city)
 
