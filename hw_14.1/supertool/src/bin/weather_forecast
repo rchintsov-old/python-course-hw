@@ -7,14 +7,13 @@ from supertool import weather
 if __name__ == '__main__':
 
     print('')
-    parser = argparse.ArgumentParser(description='Find similar files')
+    parser = argparse.ArgumentParser(description='Weather forecast')
 
-    parser.add_argument('city', type=str, help='target city')
-    parser.add_argument('token', type=str, help='token')
+    parser.add_argument('city', type=str, help='City')
+    parser.add_argument('token', type=str, help='API token')
 
     args = parser.parse_args()
 
     weather.get()
 
 
-.gitignore - скачать репозиторий и он только диффы увидит
