@@ -77,7 +77,7 @@ def prepare_forecast(json_answer):
                 'clouds': [],
                 'wind_speed': [],
                 'description': [],
-                'date': datetime.fromtimestamp(posixtime).strftime('%d %B'),
+                'date': datetime.fromtimestamp(posixtime).strftime('%-d %B'),
             }
             days.append(day)
 
@@ -98,8 +98,9 @@ def print_weather(weather_dict, current_day, city):
 
     current = weather_dict.pop(current_day)
 
-    print('\nCurrent weather in {}:'.format(city))
+    print('\n-- Weather in {} --\n'.format(city))
 
+    print('Current:\n')
     print('{temp}°C, {descr}\n'
           'Humidity: {hum}%\n'
           'Pressure: {pres} hPa\n'
@@ -128,7 +129,7 @@ def print_weather(weather_dict, current_day, city):
         else:
             description = describe[0]
 
-        print('\n-- {date} --\n'
+        print('-- {date} --\n\n'
               '{min_temp} - {max_temp}°C, {descr}\n'
               'Humidity: {hum}%\n'
               'Pressure: {pres} hPa\n'
