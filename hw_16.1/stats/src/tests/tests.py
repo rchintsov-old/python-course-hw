@@ -5,7 +5,8 @@ from stats import stats
 class TestCsvDataFromUrl(unittest.TestCase):
 
     def test_csv_data_from_url_positive(self):
-        self.assertEqual(stats.csv_data_from_url('https://raw.githubusercontent.com/plotly/datasets/master/iris.csv')[0], ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Name'], "Wrong answer")
+        self.assertEqual(stats.csv_data_from_url('https://raw.githubusercontent.com/plotly/datasets/master/iris.csv')[0], 
+            ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Name'], "Wrong answer")
 
 
 class TestCategoricalEncoding(unittest.TestCase):
