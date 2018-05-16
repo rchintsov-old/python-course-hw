@@ -1,6 +1,8 @@
 import src.supertool.similar_files as sf
 import unittest
 import os
+import io
+from contextlib import redirect_stdout
 
 
 class TestMD5Calc(unittest.TestCase):
@@ -46,7 +48,65 @@ class TestCompareMD5Sums(unittest.TestCase):
             ['dupl_2.txt', 'non_dupl.txt', 'dupl_1.txt']), dict,
             'Wrong type of output duplicates list')
 
+
     def tearDown(self):
         os.chdir('../')
 
+
+class TestPrintSimilar(unittest.TestCase):
+    
+    def test_print_similar_with_no_similar_files_negative(self):
+
+        expected_stdout = '\nSearch path: /home\nNo similar files.\n'
+        stdout_handler = io.StringIO()
+
+        with redirect_stdout(stdout_handler):
+            sf.print_similar({}, '/home')
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(expected_stdout, got_stdout, 'Wrong stdout')
+
+
+    def test_print_similar_with_sample_similar_input_positive(self):
+
+        expected_stdout = '\nSearch path: /\n\n1 group(s) of similar ' \
+                          'files found:\ngroup 1: a.txt, b.txt\n'
+
+        stdout_handler = io.StringIO()
+
+        with redirect_stdout(stdout_handler):
+            sf.print_similar({'123': ['a.txt', 'b.txt']}, '/')
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(expected_stdout, got_stdout, 'Wrong stdout')
+
+
+class TestMain(unittest.TestCase):
+
+    def test_main_in_duplicates_dir_positive(self):
+
+        expected_stdout = '\nSearch path: ./duplicates\n\n1 group(s) ' \
+                          'of similar files found:\ngroup 1: dupl_2.txt, ' \
+                          'dupl_1.txt\n'
+
+        stdout_handler = io.StringIO()
+
+        with redirect_stdout(stdout_handler):
+            sf.main('./duplicates')
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(expected_stdout, got_stdout, 'Wrong stdout')
+
+
+    def test_main_in_test_ditectory_negative(self):
+
+        expected_stdout = '\nSearch path: ./\nNo similar files.\n'
+
+        stdout_handler = io.StringIO()
+
+        with redirect_stdout(stdout_handler):
+            sf.main('./')
+
+        got_stdout = stdout_handler.getvalue()
+        self.assertEqual(expected_stdout, got_stdout, 'Wrong stdout')
 
