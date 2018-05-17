@@ -199,8 +199,3 @@ def print_weather(weather_dict, current_day, city):
             cloud = int(np.mean(weather_dict[day]['clouds'])),
             wind = round(np.mean(weather_dict[day]['wind_speed']), 1)
         ))
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
