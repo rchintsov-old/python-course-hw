@@ -12,19 +12,19 @@ class prop:
 
 
     def __get__(self, instance, a):
-        if not self.fget:
+        if self.fget is None:
             raise AttributeError("can't get the attribute")
         return self.fget(instance)
 
 
     def __set__(self, instance, value):
-        if not self.fset:
+        if self.fset is None:
             raise AttributeError("can't set the attribute")
         return self.fset(instance, value)
 
 
     def __delete__(self, instance):
-        if not self.fdel:
+        if self.fdel is None:
             raise AttributeError("can't delete the attribute")
         return self.fdel(instance)
 
