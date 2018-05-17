@@ -52,7 +52,6 @@ def get_coordinates(city, street='', house=''):
         sys.exit(1)
 
 
-
 def get_weather(coord_dict, token=None, test=True):
     """
     Getting weather from Open Weather Map by coordinates (needs token).
@@ -84,7 +83,6 @@ def get_weather(coord_dict, token=None, test=True):
     else:
         print('Connection failed.')
         sys.exit(1)
-
 
 
 def prepare_forecast(json_answer):
@@ -168,7 +166,6 @@ def print_weather(weather_dict, current_day, city):
         cloud = int(np.mean(current['clouds'])),
         wind = round(np.mean(current['wind_speed']), 1)
     ))
-
 
     print('\nForecast for 5 days:\n')
 
