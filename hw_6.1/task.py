@@ -10,7 +10,7 @@ class MyDict(dict):
         Get or set a value.
 
         :param class cls: Currency class child.
-        :param (int, float) val: exchange rate
+        :param (int, float) val: exchange rate.
         :raises ValueError: when got one argument and it is not a class.
         :raises ValueError: when exchange rate < 0.
         """
@@ -190,4 +190,3 @@ if __name__ == '__main__':
 
     print('\ncurrencies for euro:', e.course)
     print('euro course for dollar:', e.course(Dollar))
-
