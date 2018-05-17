@@ -44,7 +44,7 @@ class Car(Vehicle):
         self.base_cost = base_cost
         self.passed_km = passed_km
         self.year = year
-        self.model = model
+        self.model_ = model
 
     @property
     def vehicle_type(self):
@@ -56,7 +56,7 @@ class Car(Vehicle):
 
     @property
     def model(self):
-        return self.model
+        return self.model_
 
 
 class Motorcycle(Vehicle):
@@ -65,7 +65,7 @@ class Motorcycle(Vehicle):
         self.base_cost = base_cost
         self.passed_km = passed_km
         self.year = year
-        self.model = model
+        self.model_ = model
 
     @property
     def vehicle_type(self):
@@ -77,7 +77,7 @@ class Motorcycle(Vehicle):
 
     @property
     def model(self):
-        return self.model
+        return self.model_
 
 
 class Truck(Vehicle):
@@ -86,7 +86,7 @@ class Truck(Vehicle):
         self.base_cost = base_cost
         self.passed_km = passed_km
         self.year = year
-        self.model = model
+        self.model_ = model
 
     @property
     def vehicle_type(self):
@@ -98,7 +98,7 @@ class Truck(Vehicle):
 
     @property
     def model(self):
-        return self.model
+        return self.model_
 
 
 class Bus(Vehicle):
@@ -107,7 +107,7 @@ class Bus(Vehicle):
         self.base_cost = base_cost
         self.passed_km = passed_km
         self.year = year
-        self.model = model
+        self.model_ = model
 
     @property
     def vehicle_type(self):
@@ -119,13 +119,13 @@ class Bus(Vehicle):
 
     @property
     def model(self):
-        return self.model
+        return self.model_
 
 
 if __name__ == '__main__':
 
     bus = Bus(2012, 'Man', 120000, 10000)
-    bus.vehicle_type()
+    bus.vehicle_type
 
 
 
