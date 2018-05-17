@@ -4,25 +4,30 @@ import argparse
 
 from supertool import weather as w
 
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Weather forecast for specified city.')
 
-    parser.add_argument('city', type=str, metavar='CITY', help='City where need to show the weather.')
+    parser.add_argument('city', type=str, metavar='CITY',
+                        help='City where need to show the weather.')
     parser.add_argument('--token', metavar='TOKEN', type=str, help='API token', default='')
     parser.add_argument('--street', metavar='STREET', type=str, help='Street', default='')
     parser.add_argument('--house', metavar='HOUSENUM', type=str, help='House number', default='')
 
     args = parser.parse_args()
 
+    # switch script to test mode if token wasn't specified
     if args.token:
         test = False
     else:
         test = True
 
+    # preparing
     coord_dict = w.get_coordinates(args.city, args.street, args.house)
     json_answer = w.get_weather(coord_dict, token=args.token, test=test)
     five_days, current_day, city = w.prepare_forecast(json_answer)
 
+    # print to console
     w.print_weather(five_days, current_day, city)
 
