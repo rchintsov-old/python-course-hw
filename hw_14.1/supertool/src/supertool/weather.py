@@ -5,8 +5,23 @@ import numpy as np
 import sys
 
 
-def get_coordinates(city, street, house):
+def get_coordinates(city, street='', house=''):
+    """
+    Getting coordinates from Nominatim by city, street & house number.
 
+    :param str city: city.
+    :param str street: street.
+    :param str house: house number.
+    :return: latitude & longitude.
+    :rtype: dict
+    :raises SystemExit(2): if can not find specified address in Nominatim.
+    :raises SystemExit(1): if connection with Nominatim failed.
+
+    :Example:
+
+    >>> get_coordinates('Санкт-Петербург')
+    {'lat': '59.938732', 'lon': '30.316229'}
+    """
     url = "http://nominatim.openstreetmap.org/search"
 
     street = '{} {}'.format(house, street)
@@ -24,7 +39,7 @@ def get_coordinates(city, street, house):
         ans = json.loads(response.text)
 
         if not ans:
-            print('Невозможно найти данный адрес.')
+            print('Can not find specified address.')
             sys.exit(2)
 
         coord_dict = {i: ans[0][i] for i in ans[0] if i in ['lon', 'lat']}
@@ -32,16 +47,32 @@ def get_coordinates(city, street, house):
         return coord_dict
 
     else:
-        print('Не удается установить соединение.')
-        sys.exit(2)
+        print('Connection failed.')
+        sys.exit(1)
 
 
 
 def get_weather(coord_dict, token=None, test=True):
+    """
+    Getting weather from Open Weather Map by coordinates (needs token).
 
+    :param dict coord_dict: latitude & logitude.
+    :param str token: token to Open Weather Map API.
+    :param bool test: if test=True, returns sample weather from OWM.
+    :return: json answer from OpenWM server.
+    :rtype: str
+    :raises SystemExit(1): if connection with OpenWM failed.
+
+
+    :Example:
+
+    >>> get_weather({'lat': '59.938732', 'lon': '30.316229'}).keys()
+    dict_keys(['cod', 'message', 'cnt', 'list', 'city'])
+    """
     if test:
         url = "http://samples.openweathermap.org/data/2.5/forecast"
-        querystring = {"lat":"35","lon":"139","appid":"b6907d289e10d714a6e88b30761fae22"}
+        querystring = {"lat":"35","lon":"139",
+                       "appid":"b6907d289e10d714a6e88b30761fae22"}
     else:
         url = 'http://api.openweathermap.org/data/2.5/forecast'
         querystring = coord_dict.update({'appid': token})
@@ -51,13 +82,28 @@ def get_weather(coord_dict, token=None, test=True):
     if response.status_code == 200:
         return json.loads(response.text)
     else:
-        print('Не удается установить соединение.')
-        sys.exit(2)
+        print('Connection failed.')
+        sys.exit(1)
 
 
 
 def prepare_forecast(json_answer):
+    """
+    Prepare forecast for displaying.
 
+    :param str json_answer: json answer from OpenWM server.
+    :return: forecast + current weather, current date, city name.
+    :rtype: tuple(dict, int, str)
+
+    :Example:
+
+    >>> prepare_forecast(get_weather({}))[2]
+    'Tawarano'
+    >>> prepare_forecast(get_weather({}))[1]
+    30
+    >>> prepare_forecast(get_weather({}))[0].keys()
+    dict_keys([30, 31, 1, 2, 3, 4])
+    """
     city = json_answer['city']['name']
 
     forecast = json_answer['list']
@@ -95,7 +141,15 @@ def prepare_forecast(json_answer):
 
 
 def print_weather(weather_dict, current_day, city):
+    """
+    Print weather to console.
 
+    :param dict weather_dict: weather.
+    :param int current_day: current date.
+    :param str city: city name.
+    :return: console output.
+    :rtype: text
+    """
     current = weather_dict.pop(current_day)
 
     print('\n-- Weather in {} --\n'.format(city))
@@ -146,3 +200,7 @@ def print_weather(weather_dict, current_day, city):
             wind = round(np.mean(weather_dict[day]['wind_speed']), 1)
         ))
 
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
