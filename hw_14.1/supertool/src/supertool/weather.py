@@ -63,7 +63,6 @@ def get_weather(coord_dict, token=None, test=True):
     :rtype: str
     :raises SystemExit(1): if connection with OpenWM failed.
 
-
     :Example:
 
     >>> get_weather({'lat': '59.938732', 'lon': '30.316229'}).keys()
