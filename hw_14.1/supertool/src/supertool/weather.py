@@ -1,8 +1,9 @@
-import requests
 import json
-from datetime import datetime
-import numpy as np
 import sys
+from datetime import datetime
+
+import numpy as np
+import requests
 
 
 def get_coordinates(city, street='', house=''):
