@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.6
 
 import argparse
+import sys
 
 from supertool import weather as w
 
@@ -23,11 +24,27 @@ if __name__ == '__main__':
     else:
         test = True
 
+    # getting info and preparing it to show in console
+    # coordinates
+    try:
+        coord_dict = w.get_coordinates(args.city, args.street, args.house)
+    except AddressException as coord_e:
+        print(coord_e.args[0])
+        sys.exit(2)
+    except ConnecionFail as conn_e:
+        print(conn_e.args[0])
+        sys.exit(1)
+
+    # weather
+    try:
+        json_answer = w.get_weather(coord_dict, token=args.token, test=test)
+    except ConnecionFail as conn_e:
+        print(conn_e.args[0])
+        sys.exit(1)
+
     # preparing
-    coord_dict = w.get_coordinates(args.city, args.street, args.house)
-    json_answer = w.get_weather(coord_dict, token=args.token, test=test)
     five_days, current_day, city = w.prepare_forecast(json_answer)
 
-    # print to console
+    # show in console
     w.print_weather(five_days, current_day, city)
 

@@ -6,6 +6,30 @@ import numpy as np
 import requests
 
 
+class AddressException(Exception):
+    """
+    Raises when Nominatim can not find specified address.
+
+    :param str message: error explanation (optional).
+    :return: AddressException.
+    :rtype: class instance
+    """
+    def __init__(self, message=''):
+       Exception.__init__(self, message)
+
+
+class ConnecionFail(Exception):
+    """
+    Raises when connection if failed.
+
+    :param str message: error explanation (optional).
+    :return: ConnecionFail.
+    :rtype: class instance
+    """
+    def __init__(self, message=''):
+       Exception.__init__(self, message)
+
+
 def get_coordinates(city, street='', house=''):
     """
     Getting coordinates from Nominatim by city, street & house number.
@@ -15,8 +39,8 @@ def get_coordinates(city, street='', house=''):
     :param str house: house number.
     :return: latitude & longitude.
     :rtype: dict
-    :raises SystemExit(2): if can not find specified address in Nominatim.
-    :raises SystemExit(1): if connection with Nominatim failed.
+    :raises AddressException: if can not find specified address in Nominatim.
+    :raises ConnecionFail: if connection with Nominatim was failed.
 
     :Example:
 
@@ -40,16 +64,13 @@ def get_coordinates(city, street='', house=''):
         ans = json.loads(response.text)
 
         if not ans:
-            print('Can not find specified address.')
-            sys.exit(2)
+            raise AddressException('Can not find specified address.')
 
         coord_dict = {i: ans[0][i] for i in ans[0] if i in ['lon', 'lat']}
-
         return coord_dict
 
     else:
-        print('Connection failed.')
-        sys.exit(1)
+        raise ConnecionFail("Can't connect to Nominatim.")
 
 
 def get_weather(coord_dict, token=None, test=True):
@@ -61,7 +82,7 @@ def get_weather(coord_dict, token=None, test=True):
     :param bool test: if test=True, returns sample weather from OWM.
     :return: json answer from OpenWM server.
     :rtype: str
-    :raises SystemExit(1): if connection with OpenWM failed.
+    :raises ConnecionFail: if connection with OpenWM was failed.
 
     :Example:
 
@@ -81,8 +102,7 @@ def get_weather(coord_dict, token=None, test=True):
     if response.status_code == 200:
         return json.loads(response.text)
     else:
-        print('Connection failed.')
-        sys.exit(1)
+        raise ConnecionFail("Can't connect to Open Weather Map.")
 
 
 def prepare_forecast(json_answer):
