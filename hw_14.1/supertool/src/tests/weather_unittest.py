@@ -11,13 +11,13 @@ class TestGetCoordinates(unittest.TestCase):
         self.assertEqual(weather.get_coordinates('Санкт-Петербург'),
                          {'lat': '59.938732', 'lon': '30.316229'}, "Wrong answer")
 
-    # testing an exception SystemExit: 2
+    # testing an exception AddressException: "Can not find specified address."
     def test_get_coordinates_with_Exit_2_exception(self):
 
-        with self.assertRaises(SystemExit) as e:
+        with self.assertRaises(weather.AddressException) as e:
             weather.get_coordinates('лытдыбр')
 
-        self.assertEqual(e.exception.args[0], 2, "Exit code doesn't match")
+        self.assertEqual(e.exception.args[0], "Can not find specified address.")
 
 
 class TestGetWeather(unittest.TestCase):
@@ -50,8 +50,8 @@ class TestPrintWeather(unittest.TestCase):
     def test_print_weather_with_stdout_redirect(self):
 
         expected_stdout = '\n-- Weather in Tawarano --\n\n' \
-                          'Current:\n\n10.6°C, clear sky\nHumidity: 100%' \
-                          '\nPressure: 1017 hPa\nCloudiness: 0%\n' \
+                          'Current:\n\n10.6°C, clear sky\nHumidity: 100 %' \
+                          '\nPressure: 1017 hPa\nCloudiness: 0 %\n' \
                           'Wind speed: 7.3 m/s\n'
 
         handler = io.StringIO()
@@ -62,7 +62,7 @@ class TestPrintWeather(unittest.TestCase):
                     weather.get_weather({})
                 ))
 
-        self.assertEqual(handler.getvalue()[:125], expected_stdout, 'Wrong stdout')
+        self.assertEqual(handler.getvalue()[:127], expected_stdout, 'Wrong stdout')
 
 
 if __name__ == '__main__':
