@@ -154,6 +154,8 @@ def prepare_forecast(json_answer):
         if cast.get('weather'):
             if cast['weather'][0].get('description'):
                 five_days[day]['description'].append(cast['weather'][0]['description'])
+            if cast['weather'][0].get('icon'):
+                five_days[day]['icon'].append(cast['weather'][0]['icon'])
         if cast.get('clouds'):
             if cast['clouds'].get('all') is not None:
                 five_days[day]['clouds'].append(cast['clouds']['all'])
