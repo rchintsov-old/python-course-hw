@@ -126,12 +126,21 @@ def prepare_forecast(json_answer):
             days.append(day)
 
         main = cast['main']
-        five_days[day]['temp'].append(main['temp'] - 273.15)
-        five_days[day]['pressure'].append(main['pressure'])
-        five_days[day]['humidity'].append(main['humidity'])
-        five_days[day]['description'].append(cast['weather'][0]['description'])
-        five_days[day]['clouds'].append(cast['clouds']['all'])
-        five_days[day]['wind_speed'].append(cast['wind']['speed'])
+        if main.get('temp') is not None:
+            five_days[day]['temp'].append(main['temp'] - 273.15)
+        if main.get('pressure'):
+            five_days[day]['pressure'].append(main['pressure'])
+        if main.get('humidity') is not None:
+            five_days[day]['humidity'].append(main['humidity'])
+        if cast.get('weather'):
+            if cast['weather'][0].get('description'):
+                five_days[day]['description'].append(cast['weather'][0]['description'])
+        if cast.get('clouds'):
+            if cast['clouds'].get('all') is not None:
+                five_days[day]['clouds'].append(cast['clouds']['all'])
+        if cast.get('wind'):
+            if cast['wind'].get('speed') is not None:
+                five_days[day]['wind_speed'].append(cast['wind']['speed'])
 
     current_day = days[0]
 
@@ -154,45 +163,58 @@ def print_weather(weather_dict, current_day, city):
 
     print('Current:\n')
     print('{temp}°C, {descr}\n'
-          'Humidity: {hum}%\n'
+          'Humidity: {hum} %\n'
           'Pressure: {pres} hPa\n'
-          'Cloudiness: {cloud}%\n'
+          'Cloudiness: {cloud} %\n'
           'Wind speed: {wind} m/s\n'.format(
 
-        temp = round(current['temp'][0], 1),
-        descr = current['description'][0],
-        hum = int(np.mean(current['humidity'])),
-        pres = int(np.mean(current['pressure'])),
-        cloud = int(np.mean(current['clouds'])),
-        wind = round(np.mean(current['wind_speed']), 1)
+        temp = round(current['temp'][0], 1) if current.get('temp') else 'unknown',
+        descr = current['description'][0] if current.get('description') else 'no description',
+        hum = int(np.mean(current['humidity'])) if current.get('humidity') else 'unknown',
+        pres = int(np.mean(current['pressure'])) if current.get('pressure') else 'unknown',
+        cloud = int(np.mean(current['clouds'])) if current.get('clouds') else 'unknown',
+        wind = round(np.mean(current['wind_speed']), 1) \
+            if current.get('wind_speed') else 'unknown',
     ))
 
     print('\nForecast for 5 days:\n')
 
     for day in weather_dict:
-        describe = weather_dict[day]['description']
-        if len(set(describe)) > 1:
-            start_desc = describe[0]
-            while describe[-1] == start_desc:
-                describe.pop(-1)
-            end_desc = describe[-1]
-            description = 'from {} to {}'.format(start_desc, end_desc)
+        if weather_dict[day].get('description'):
+            describe = weather_dict[day]['description']
+
+            if len(set(describe)) > 1:
+                start_desc = describe[0]
+
+                while describe[-1] == start_desc:
+                    describe.pop(-1)
+                end_desc = describe[-1]
+
+                description = 'from {} to {}'.format(start_desc, end_desc)
+            else:
+                description = describe[0]
         else:
-            description = describe[0]
+            description = 'no description'
 
         print('-- {date} --\n\n'
               '{min_temp} - {max_temp}°C, {descr}\n'
-              'Humidity: {hum}%\n'
+              'Humidity: {hum} %\n'
               'Pressure: {pres} hPa\n'
-              'Cloudiness: {cloud}%\n'
+              'Cloudiness: {cloud} %\n'
               'Wind speed: {wind} m/s\n'.format(
 
             date = weather_dict[day]['date'],
-            min_temp = round(min(weather_dict[day]['temp']), 1),
-            max_temp = round(max(weather_dict[day]['temp']), 1),
+            min_temp = round(min(weather_dict[day]['temp']), 1) \
+                if weather_dict[day].get('temp') else 'unknown',
+            max_temp = round(max(weather_dict[day]['temp']), 1) \
+                if weather_dict[day].get('temp') else 'unknown',
             descr = description,
-            hum = int(np.mean(weather_dict[day]['humidity'])),
-            pres = int(np.mean(weather_dict[day]['pressure'])),
-            cloud = int(np.mean(weather_dict[day]['clouds'])),
-            wind = round(np.mean(weather_dict[day]['wind_speed']), 1)
+            hum = int(np.mean(weather_dict[day]['humidity'])) \
+                if weather_dict[day].get('humidity') else 'unknown',
+            pres = int(np.mean(weather_dict[day]['pressure'])) \
+                if weather_dict[day].get('pressure') else 'unknown',
+            cloud = int(np.mean(weather_dict[day]['clouds'])) \
+                if weather_dict[day].get('clouds') else 'unknown',
+            wind = round(np.mean(weather_dict[day]['wind_speed']), 1) \
+                if weather_dict[day].get('wind_speed') else 'unknown',
         ))
