@@ -19,10 +19,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # switch script to test mode if token wasn't specified
-    if args.token:
-        test = False
-    else:
-        test = True
+    test = False if args.token else True
 
     # getting info and preparing it to show in console
     try:
@@ -31,11 +28,8 @@ if __name__ == '__main__':
         # weather
         json_answer = w.get_weather(coord_dict, token=args.token, test=test)
 
-    except w.AddressException as coord_e:
-        print(coord_e.args[0])
-        sys.exit(2)
-    except w.ConnecionFail as conn_e:
-        print(conn_e.args[0])
+    except (w.AddressException, w.ConnecionFail) as e:
+        print(e.args[0])
         sys.exit(1)
 
     # preparing
