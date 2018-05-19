@@ -25,20 +25,16 @@ if __name__ == '__main__':
         test = True
 
     # getting info and preparing it to show in console
-    # coordinates
     try:
+        # coordinates
         coord_dict = w.get_coordinates(args.city, args.street, args.house)
-    except AddressException as coord_e:
+        # weather
+        json_answer = w.get_weather(coord_dict, token=args.token, test=test)
+
+    except w.AddressException as coord_e:
         print(coord_e.args[0])
         sys.exit(2)
-    except ConnecionFail as conn_e:
-        print(conn_e.args[0])
-        sys.exit(1)
-
-    # weather
-    try:
-        json_answer = w.get_weather(coord_dict, token=args.token, test=test)
-    except ConnecionFail as conn_e:
+    except w.ConnecionFail as conn_e:
         print(conn_e.args[0])
         sys.exit(1)
 
