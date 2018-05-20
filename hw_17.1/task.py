@@ -129,7 +129,6 @@ class MainApplication(QtWidgets.QMainWindow):
             if not self.just_evaluated:
                 self.expression += self.collector
                 try:
-                    print('prop')
                     result = eval(self.expression)
                 except ZeroDivisionError:
                     result = 0
