@@ -14,7 +14,7 @@ class Ui_MainWindow(object):
         font.setKerning(True)
         self.lcd.setFont(font)
         self.lcd.setToolTipDuration(-1)
-        self.lcd.setDigitCount(9)
+        self.lcd.setDigitCount(10)
         self.lcd.setSegmentStyle(QtWidgets.QLCDNumber.Filled)
         self.lcd.setProperty("value", 0.0)
         self.lcd.setProperty("intValue", 0)

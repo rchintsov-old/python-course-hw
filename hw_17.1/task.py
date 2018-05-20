@@ -14,8 +14,6 @@ class MainApplication(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.expression = ''
         self.collector = ''
-        # some locks (should be in descriptor, but
-        # there are no descriptors)
         self.just_evaluated = False
         self.dot_allowed = True
 
@@ -131,12 +129,16 @@ class MainApplication(QtWidgets.QMainWindow):
             if not self.just_evaluated:
                 self.expression += self.collector
                 try:
+                    print('prop')
                     result = eval(self.expression)
                 except ZeroDivisionError:
                     result = 0
                 if result:
-                    self.expression = str(int(result)) if result % \
-                    int(result) == 0 else str(result)
+                    if int(result):
+                        self.expression = str(int(result))[:10] if result % \
+                            int(result) == 0 else str(result)[:10]
+                    else:
+                        self.expression = str(result)[:10]
                 else:
                     self.expression = str(0)
                 self.collector = self.expression
