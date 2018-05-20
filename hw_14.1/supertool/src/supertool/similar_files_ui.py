@@ -1,4 +1,3 @@
-#!/usr/bin/env python3.6
 """
 Application to search duplicates.
 """
@@ -83,8 +82,15 @@ class MainApplication(QtWidgets.QMainWindow):
         self.ui.treeWidget.expandAll()
 
 
-app = QtWidgets.QApplication(sys.argv)
-window = MainApplication()
-window.show()
+def start():
+    """The main function."""
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainApplication()
+    window.show()
 
-sys.exit(app.exec_())
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+
+    start()

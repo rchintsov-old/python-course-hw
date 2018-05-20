@@ -1,5 +1,3 @@
-#!/usr/bin/env python3.6
-
 import os
 import sys
 from contextlib import suppress
@@ -10,11 +8,13 @@ from supertool import weather
 from supertool import weather_qt
 from PyQt5 import QtWidgets, QtGui, QtCore
 
+
 TEST_MODE_STRING = \
-"""The application is in the test mode.
+"""App is running in the test mode.
 You can see only the sample weather from Tawarano. 
 
-For full access replace the OpenWeatherMap token placed in "{}"
+For full access replace the OpenWeatherMap token \
+placed in "{}"
 with your own one and restart the app.
 
 For testing just press "Get weather" button."""
@@ -30,7 +30,7 @@ class MainApplication(QtWidgets.QMainWindow):
         self.label = self.ui.label
 
         self.forecasting = False
-        self.dates = []
+        self.order = []
         self.param_collection = {
             'temp': 'Temperature: {}°C',
             'descr': '{}',
@@ -39,17 +39,22 @@ class MainApplication(QtWidgets.QMainWindow):
             'cloud': 'Cloudiness: {}%',
             'wind': 'Wind speed: {} m/s',
         }
-
+        
+        self.filename = 'OpenWM token.txt'
+        self.test_token = 'b6907d289e10d714a6e88b30761fae22'
         self.token = self.get_token()
-        # it is the test OWM token
-        if self.token == 'b6907d289e10d714a6e88b30761fae22':
+        # check OWM token
+        if self.token == self.test_token:
             self.test = True
             self.ui.line_city_widget.setText('Tawarano')
             self.label.setText(TEST_MODE_STRING.format(
-                os.path.join(os.getcwd(), 'OpenWM token.txt')
+                os.path.join(
+                    *os.path.normpath(__file__).split(os.sep)[:-2] + \
+                             ['static', self.filename])
             ))
         else:
             self.test = False
+            self.label.setText('Please, type a city')
 
         # button connection
         self.ui.button_get.clicked.connect(self.get_weather)
@@ -64,26 +69,28 @@ class MainApplication(QtWidgets.QMainWindow):
         :return: token.
         :rtype: str
         """
-        token = 'b6907d289e10d714a6e88b30761fae22'
-        filename = 'OpenWM token.txt'
+        token = self.test_token
+        path = os.path.join('..', 'static', self.filename)
         # if file exist
-        if os.path.exists(filename):
-            with open(filename, 'r') as f:
+        if os.path.exists(path):
+            with open(path, 'r') as f:
                 line = f.readline().strip()
                 token = line if line else token
         else: # if not exist - create it
             with suppress(Exception):
-                with open(filename, 'a') as f:
+                with open(path, 'a') as f:
                     f.write(token)
         return token
 
 
-    def get_weather(self):
+    def get_info_from_widgets(self):
         """
-        The main function to get info from user input, handle exceptions
-        and return the weather data.
+        Getting info from widgets.
+
+        :return: tuple with typed city, street and house number.
+        :rtype: tuple
         """
-        # getting user input
+        street, house = '', ''
         typed_city = self.ui.line_city_widget.text()
         extra_info = self.ui.street_house_line_w.text()
         # checks whether the street and house was specified
@@ -91,93 +98,70 @@ class MainApplication(QtWidgets.QMainWindow):
             try:
                 street, house = [i.strip() for i in extra_info.split(',')]
             except ValueError:
-                street, house = extra_info, ''
-        else:
-            street, house = '', ''
+                street = extra_info
+
+        return typed_city, street, house
+
+
+    def get_weather(self):
+        """
+        Geting info from user input, handle exceptions
+        and return the weather data.
+        """
+        # getting user input
+        city, street, house = self.get_info_from_widgets()
 
         # ad hoc solution for tabWidget objects: PyQt can't remove it
-        # when once it was created
+        # when once it was created.
         if self.forecasting:
 
-            # checking for odd clicks
-            if self.city == typed_city and \
-                self.street == street and \
+            # filtering odd clicks
+            if self.city == city and self.street == street and \
                 self.house == house:
-                # func interruption
+                # interruption
                 return
 
             # remove all existing tabs if tabWidget already in use
             while self.tabWidget.count():
                 self.tabWidget.removeTab(0)
+        else:
+            self.label.setText('Loading...')
 
-        # saveing to instance
-        self.city = typed_city
-        self.street = street
-        self.house = house
+        self.city, self.street, self.house = city, street, house
 
         # retrieving weather
-        json_answer = None
-        failed = False
+        json_answer, failed = None, True
         try:
-            coord_dict = weather.get_coordinates(
-                self.city, self.street, self.house)
+            coord_dict = weather.get_coordinates(city, street, house)
             json_answer = weather.get_weather(
                 coord_dict, token=self.token, test=self.test)
 
         # possible exceptions, preparing user message
-        except weather.AddressException as e1:
-            if len(self.city):
-                answer = e1.args[0] + '\nPlease, type another one.'
-            else:
-                answer = 'Empty query. Type any address, please.'
-            failed = True
+        except weather.AddressException as e_1:
+            answer = e_1.args[0] + '\nPlease, type another one.' \
+                if len(city) else 'The empty query. Type any address, please.'
 
-        except weather.ConnecionFail as e2:
-            answer = e2.args[0] + '\nTry again later.'
-            failed = True
+        except weather.ConnecionFail as e_2:
+            answer = e_2.args[0] + '\nTry again later.'
 
         except requests.exceptions.ConnectionError:
             answer = 'Connection failed.\n' \
                      'Check your Internet connection.'
-            failed = True
+        else:
+            failed = False
 
         # shows error message to user
         if failed:
             if not self.forecasting:
                 self.label.setText(answer)
             else:
-                # creating error tab
-                error_tab = QtWidgets.QWidget()
-                error_tab.setFont(self.ui.font)
-                error_tab.setObjectName("err_tab")
-
-                # message widget
-                label = QtWidgets.QLabel(error_tab)
-                sizePolicy_e = QtWidgets.QSizePolicy(
-                    QtWidgets.QSizePolicy.Maximum,
-                    QtWidgets.QSizePolicy.Maximum)
-                sizePolicy_e.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
-                label.setSizePolicy(sizePolicy_e)
-                label.setMinimumSize(QtCore.QSize(430, 260))
-                label.setMaximumSize(QtCore.QSize(16777215, 16777215))
-                label.setFont(self.ui.font)
-                label.setAlignment(QtCore.Qt.AlignCenter)
-                label.setWordWrap(True)
-                label.setMargin(5)
-                label.setObjectName("ae_label")
-
-                # setting text
-                label.setText(answer)
-                # adding tab
-                self.tabWidget.addTab(error_tab, "")
-                # naming tab
+                # creating tab with answer
+                self.tabWidget.addTab(self.create_error_tab(answer), "")
                 self.tabWidget.setTabText(0, 'Error')
                 # func interruption
                 return
-
-        # prepare & show a weather
+        # prepare & show the weather
         if json_answer:
-
             weather_dict, current_day, city = weather.prepare_forecast(
                 json_answer)
             self.label.setText('{} {}'.format(current_day, city))
@@ -185,6 +169,40 @@ class MainApplication(QtWidgets.QMainWindow):
             self.show_weather(weather_dict, current_day, city)
             # says that  tabWidget already appeared (in use)
             self.forecasting = True
+
+
+    def create_error_tab(self, answer):
+        """
+        Creating tab object for further adding to tabWidget.
+
+        :param str answer: error message to displaying.
+        :return: tab object.
+        :rtype: QObject
+        """
+        # creating tab
+        error_tab = QtWidgets.QWidget()
+        error_tab.setFont(self.ui.font)
+        error_tab.setObjectName("err_tab")
+
+        # add QLabel widget to tab
+        label = QtWidgets.QLabel(error_tab)
+        sizePolicy_e = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Maximum,
+            QtWidgets.QSizePolicy.Maximum)
+        sizePolicy_e.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
+        label.setSizePolicy(sizePolicy_e)
+        label.setMinimumSize(QtCore.QSize(430, 260))
+        label.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        label.setFont(self.ui.font)
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        label.setWordWrap(True)
+        label.setMargin(5)
+        label.setObjectName("err_label")
+
+        # set error message to QLabel
+        label.setText(answer)
+
+        return error_tab
 
 
     def show_icon(self, parentLayout, icon, day):
@@ -198,7 +216,7 @@ class MainApplication(QtWidgets.QMainWindow):
         :rtype: QObject
         """
         # path to static folder
-        icon = os.path.join('..', 'static', icon + '.png')
+        icon = os.path.join('..', 'static', 'img', icon + '.png')
 
         verticalWidget = QtWidgets.QWidget(parentLayout)
         sizePolicy = QtWidgets.QSizePolicy(
@@ -225,10 +243,8 @@ class MainApplication(QtWidgets.QMainWindow):
         # add icon to label object
         pixmap = QtGui.QPixmap(icon)
         label_Pixmap.setPixmap(pixmap)
-
         # adding to layout
         verticalLayout.addWidget(label_Pixmap, 0, QtCore.Qt.AlignRight)
-
         # bottom spacer for it
         spacerItem = QtWidgets.QSpacerItem(20, 40,
                                            QtWidgets.QSizePolicy.Minimum,
@@ -238,21 +254,21 @@ class MainApplication(QtWidgets.QMainWindow):
         return verticalWidget
 
 
-    # the main party
-    def show_weather(self, *args):
+    def prepare_weather_dict(self, weather_dict, current_day):
         """
-        Creates tabWidget object, tabs and other objects to show.
+        Preparing weather to show.
 
-        :param dict weather_dict: dict with prepared weather.
-        :param int current_day: current date.
-        :param str city: city name (added for compatibility).
-        :return: UI output.
+        :param dict weather_dict: dict with weather.
+        :param int current_day: current day.
+        :return: prepared weather dict.
+        :rtype: dict
         """
-        weather_dict, current_day, city = args
+        output_dict = {}
 
+        # current weather
         current = weather_dict.pop(current_day)
+        self.order.append('Current')
 
-        # prepare current weather data
         prepared = {
             'temp': round(current['temp'][0], 1)
                 if current.get('temp') else None,
@@ -270,63 +286,12 @@ class MainApplication(QtWidgets.QMainWindow):
                 if current.get('icon') else None,
         }
 
-        if not self.forecasting:
-            # create tab widget (for all tabs)
-            self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
-            self.tabWidget.setObjectName("tabWidget")
+        output_dict.update({self.order[-1]: prepared})
 
-
-        # -------------------------------------------------------------
-        # -------------- creating current weather tab -----------------
-        # -------------------------------------------------------------
-
-        current_w_tab = QtWidgets.QWidget()
-        current_w_tab.setFont(self.ui.font)
-        current_w_tab.setObjectName("current_w_tab")
-
-        # grid in tab
-        gridLayoutWidget = QtWidgets.QWidget(current_w_tab)
-        gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 430, 260))
-        gridLayoutWidget.setObjectName("gridLayoutWidget_cur")
-
-        # 1st col for weather
-        gridLayout = QtWidgets.QGridLayout(gridLayoutWidget)
-        gridLayout.setContentsMargins(10, 20, 5, 5)
-        gridLayout.setObjectName("gridLayout_cur")
-
-        # placing params
-        row = 0
-        for param in self.param_collection:
-            if prepared.get(param) is not None:
-                param_w = QtWidgets.QLabel(gridLayoutWidget)
-                param_w.setObjectName(param + '_cur')
-                param_w.setText(
-                    self.param_collection[param].format(prepared[param]))
-                gridLayout.addWidget(param_w, row, 0, 1, 1)
-                row += 1
-
-        # bottom spacer for 1st col
-        spacerItem = QtWidgets.QSpacerItem(20, 40,
-                                           QtWidgets.QSizePolicy.Minimum,
-                                           QtWidgets.QSizePolicy.Expanding)
-        gridLayout.addItem(spacerItem, row, 0, 1, 1)
-
-        # set icon
-        if prepared.get('icon'):
-            gridLayout.addWidget(self.show_icon(
-                gridLayoutWidget, prepared['icon'], 'cur'), 0, 1, 4, 1)
-
-        # adding tab to tabWidget
-        self.tabWidget.addTab(current_w_tab, "")
-
-
-        # -------------------------------------------------------------
-        # ---------------- creating forecast tabs ---------------------
-        # -------------------------------------------------------------
-
+        # forecast
         for day in weather_dict:
-
-            # transform description from many to one
+            self.order.append(weather_dict[day]['date'])
+            # transform description from several to one
             if weather_dict[day].get('description'):
                 descriptions = weather_dict[day]['description']
                 if len(set(descriptions)) > 1:
@@ -340,9 +305,6 @@ class MainApplication(QtWidgets.QMainWindow):
                     description = descriptions[0].capitalize() + '.'
             else:
                 description = None
-
-            # saving for tab naming (see below)
-            self.dates.append(weather_dict[day]['date'])
 
             # preparing parameters
             prepared_fc = {
@@ -358,7 +320,6 @@ class MainApplication(QtWidgets.QMainWindow):
                 'icon': weather_dict[day]['icon'][-1
                 ][:-1] if weather_dict[day].get('icon') else None,
             }
-
             # adding temperature (min & max)
             if weather_dict[day].get('temp'):
                 prepared_fc.update({
@@ -367,64 +328,98 @@ class MainApplication(QtWidgets.QMainWindow):
                         round(max(weather_dict[day]['temp']), 1),
                     )})
 
-            # creating current weather tab
+            output_dict.update({self.order[-1]: prepared_fc})
+
+        return output_dict
+
+
+    def show_weather(self, weather_dict, current_day, city):
+        """
+        The main showing function.
+        Creates tabWidget object, tabs and other objects.
+
+        :param dict weather_dict: dict with prepared weather.
+        :param int current_day: current date.
+        :param str city: city name (added for compatibility).
+        :return: UI output.
+        """
+        prepared_weather_dict = self.prepare_weather_dict(
+            weather_dict, current_day
+        )
+
+        if not self.forecasting:
+            # create tab widget (for all tabs)
+            self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
+            self.tabWidget.setObjectName("tabWidget")
+
+        # creating weather tabs
+        for day in self.order:
+
+            current = prepared_weather_dict[day]
+            # tab
             tab = QtWidgets.QWidget()
             tab.setFont(self.ui.font)
-            tab.setObjectName("tab{}".format(day))
-
+            tab.setObjectName("tab_{}".format(day))
             # grid in tab
             gridLayoutWidget = QtWidgets.QWidget(tab)
             gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 430, 260))
-            gridLayoutWidget.setObjectName("gridLayoutWidget{}".format(day))
-
-            # 1st col for weather
+            gridLayoutWidget.setObjectName("gridLayoutWidget_{}".format(day))
+            # left column for weather text
             gridLayout = QtWidgets.QGridLayout(gridLayoutWidget)
             gridLayout.setContentsMargins(10, 20, 5, 5)
-            gridLayout.setObjectName("gridLayout{}".format(day))
+            gridLayout.setObjectName("gridLayout_{}".format(day))
 
             # placing params
             row = 0
             for param in self.param_collection:
-                if prepared_fc.get(param) is not None:
+                if current.get(param) is not None:
                     param_w = QtWidgets.QLabel(gridLayoutWidget)
                     param_w.setObjectName(param + '_' + str(day))
                     param_w.setText(
                         self.param_collection[param].format(
-                            prepared_fc[param]))
+                            current[param]))
                     gridLayout.addWidget(param_w, row, 0, 1, 1)
                     row += 1
 
-            # bottom spacer for 1st col
+            # bottom spacer for left column
             spacerItem = QtWidgets.QSpacerItem(
                 20, 40, QtWidgets.QSizePolicy.Minimum,
-                QtWidgets.QSizePolicy.Expanding)
+                QtWidgets.QSizePolicy.Expanding
+            )
             gridLayout.addItem(spacerItem, row, 0, 1, 1)
 
-            if prepared_fc.get('icon'):
+            # get weather icon & construct right column for it
+            if current.get('icon'):
+                # self.show_icon - functon to constract the column
                 gridLayout.addWidget(self.show_icon(
-                    gridLayoutWidget, prepared_fc['icon'], day), 0, 1, 4, 1)
+                    gridLayoutWidget, current['icon'], day), 0, 1, 4, 1)
 
             # add tab to tabWidget
             self.tabWidget.addTab(tab, "")
 
-        # -------------------- making tabs finished ------------------------
-
-        # naming tabs by date from self.dates
-        self.tabWidget.setTabText(0, "Current")
-        for num, date in enumerate(self.dates):
-            self.tabWidget.setTabText(num + 1, date)
-
+        # naming tabs by date
+        for num, date in enumerate(self.order):
+            self.tabWidget.setTabText(num, date)
         # set focus to first tab
         self.tabWidget.setCurrentIndex(0)
 
         # changing QLabel widget to tabWidget in main window
-        # (reverse operation is not possible)
+        # if tabWidget is not used yet
+        # Note: reverse operation is not possible
         if not self.forecasting:
             self.ui.general_layout.replaceWidget(self.label, self.tabWidget)
 
 
-app = QtWidgets.QApplication(sys.argv)
-window = MainApplication()
-window.show()
+def start():
+    """The main function."""
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainApplication()
+    window.show()
 
-sys.exit(app.exec_())
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+
+    start()
+

@@ -3,12 +3,8 @@
 Similar files finder entrypoint.
 """
 import argparse
-import logging
+
 from supertool import similar_files
-
-
-ROOT_LOGGER = logging.getLogger()
-
 
 if __name__ == '__main__':
 

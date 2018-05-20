@@ -37,8 +37,8 @@ setup (
     bin=[
         os.path.join('bin', 'similar_files'),
         os.path.join('bin', 'weather_forecast'),
-        os.path.join('bin', 'weather_gui'),
-        os.path.join('bin', 'similar_files_gui'),
+        os.path.join('bin', 'weather_forecast_GUI'),
+        os.path.join('bin', 'similar_files_GUI'),
     ]
 )
 

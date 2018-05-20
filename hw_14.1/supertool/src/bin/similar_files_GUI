@@ -1,0 +1,9 @@
+#!/usr/bin/env python3.6
+"""
+Similar files finder GUI.
+"""
+from supertool import similar_files_ui
+
+if __name__ == '__main__':
+
+    similar_files_ui.start()

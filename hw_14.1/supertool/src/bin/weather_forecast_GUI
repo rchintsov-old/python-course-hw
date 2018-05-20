@@ -1,0 +1,9 @@
+#!/usr/bin/env python3.6
+"""
+Weather forecast GUI.
+"""
+from supertool import weather_ui
+
+if __name__ == '__main__':
+
+    weather_ui.start()
