@@ -1,6 +1,7 @@
 # License MIT
 
 import os
+
 from setuptools import setup, find_packages
 
 DISTRO_ROOT_PATCH = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +19,6 @@ def extract_requirements(file):
         return file.read().splitlines()
 
 
-
 setup (
     name='supertool-distro',
     version='0.1',
@@ -33,11 +33,13 @@ setup (
     packages=find_packages(exclude=['tests']),
     install_requires=extract_requirements(os.path.join(DISTRO_ROOT_PATCH, 'requirements', 'base.txt')),
     test_requires=extract_requirements(os.path.join(DISTRO_ROOT_PATCH, 'requirements', 'test.txt')),
-    # переписать кусок кода с начала до bina
     test_suite='nose.collector',
-    # scripts=['bin.similar_files']
-    # scripts не работает на моей системе (ubuntu), использую bin
-    bin=[os.path.join('bin', 'similar_files'), os.path.join('bin', 'weather_forecast')]
+    bin=[
+        os.path.join('bin', 'similar_files'),
+        os.path.join('bin', 'weather_forecast'),
+        os.path.join('bin', 'weather_gui'),
+        os.path.join('bin', 'similar_files_gui'),
+    ]
 )
 
 
