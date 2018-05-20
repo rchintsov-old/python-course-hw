@@ -1,12 +1,14 @@
 import os
 import sys
 from contextlib import suppress
+from functools import partial
+from random import randint
 
 import numpy as np
 import requests
+from PyQt5 import QtWidgets, QtGui, QtCore
 from supertool import weather
 from supertool import weather_qt
-from PyQt5 import QtWidgets, QtGui, QtCore
 
 
 TEST_MODE_STRING = \
@@ -31,6 +33,7 @@ class MainApplication(QtWidgets.QMainWindow):
 
         self.forecasting = False
         self.order = []
+        self.randint = partial(randint, 0, 10000)
         self.param_collection = {
             'temp': 'Temperature: {}°C',
             'descr': '{}',
@@ -41,6 +44,8 @@ class MainApplication(QtWidgets.QMainWindow):
         }
         
         self.filename = 'OpenWM token.txt'
+        self.static = os.sep.join(
+        	__file__.split(os.sep)[:-2] + ['static'])
         self.test_token = 'b6907d289e10d714a6e88b30761fae22'
         self.token = self.get_token()
         # check OWM token
@@ -48,10 +53,8 @@ class MainApplication(QtWidgets.QMainWindow):
             self.test = True
             self.ui.line_city_widget.setText('Tawarano')
             self.label.setText(TEST_MODE_STRING.format(
-                os.path.join(
-                    *os.path.normpath(__file__).split(os.sep)[:-2] + \
-                             ['static', self.filename])
-            ))
+                os.path.join(self.static, self.filename)
+                ))
         else:
             self.test = False
             self.label.setText('Please, type a city')
@@ -139,7 +142,7 @@ class MainApplication(QtWidgets.QMainWindow):
         # possible exceptions, preparing user message
         except weather.AddressException as e_1:
             answer = e_1.args[0] + '\nPlease, type another one.' \
-                if len(city) else 'The empty query. Type any address, please.'
+                if len(city) else 'Empty query. Type any address, please.'
 
         except weather.ConnecionFail as e_2:
             answer = e_2.args[0] + '\nTry again later.'
@@ -205,18 +208,17 @@ class MainApplication(QtWidgets.QMainWindow):
         return error_tab
 
 
-    def show_icon(self, parentLayout, icon, day):
+    def show_icon(self, parentLayout, icon):
         """
         Adds weather icon to specified layout.
 
         :param QObject parentLayout: parent layout.
         :param str icon: OpenWM icon code.
-        :param int day: number for creating a unique objects signatures.
         :return: verticalWidget object (for joining with a general layout).
         :rtype: QObject
         """
         # path to static folder
-        icon = os.path.join('..', 'static', 'img', icon + '.png')
+        icon = os.path.join(self.static, 'img', '{}.png'.format(icon))
 
         verticalWidget = QtWidgets.QWidget(parentLayout)
         sizePolicy = QtWidgets.QSizePolicy(
@@ -224,12 +226,12 @@ class MainApplication(QtWidgets.QMainWindow):
             QtWidgets.QSizePolicy.MinimumExpanding)
         verticalWidget.setSizePolicy(sizePolicy)
         verticalWidget.setMinimumSize(QtCore.QSize(50, 0))
-        verticalWidget.setObjectName("verticalWidget{}".format(day))
+        verticalWidget.setObjectName("verticalWidget{}".format(self.randint()))
 
         # yet another layout
         verticalLayout = QtWidgets.QVBoxLayout(verticalWidget)
         verticalLayout.setContentsMargins(0, 0, 18, 0)
-        verticalLayout.setObjectName("verticalLayout{}".format(day))
+        verticalLayout.setObjectName("verticalLayout{}".format(self.randint()))
 
         # create base object for Pixmap object (it's a label)
         label_Pixmap = QtWidgets.QLabel(verticalWidget)
@@ -238,7 +240,7 @@ class MainApplication(QtWidgets.QMainWindow):
         label_Pixmap.setSizePolicy(sizePolicy)
         label_Pixmap.setMinimumSize(QtCore.QSize(50, 50))
         label_Pixmap.setMaximumSize(QtCore.QSize(50, 50))
-        label_Pixmap.setObjectName("Pixmap_base_{}".format(day))
+        label_Pixmap.setObjectName("Pixmap_base_{}".format(self.randint()))
 
         # add icon to label object
         pixmap = QtGui.QPixmap(icon)
@@ -359,15 +361,16 @@ class MainApplication(QtWidgets.QMainWindow):
             # tab
             tab = QtWidgets.QWidget()
             tab.setFont(self.ui.font)
-            tab.setObjectName("tab_{}".format(day))
+            tab.setObjectName("tab_{}".format(self.randint()))
             # grid in tab
             gridLayoutWidget = QtWidgets.QWidget(tab)
             gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 430, 260))
-            gridLayoutWidget.setObjectName("gridLayoutWidget_{}".format(day))
+            gridLayoutWidget.setObjectName("gridLayoutWidget_{}".format(
+                self.randint()))
             # left column for weather text
             gridLayout = QtWidgets.QGridLayout(gridLayoutWidget)
             gridLayout.setContentsMargins(10, 20, 5, 5)
-            gridLayout.setObjectName("gridLayout_{}".format(day))
+            gridLayout.setObjectName("gridLayout_{}".format(self.randint()))
 
             # placing params
             row = 0
@@ -392,7 +395,7 @@ class MainApplication(QtWidgets.QMainWindow):
             if current.get('icon'):
                 # self.show_icon - functon to constract the column
                 gridLayout.addWidget(self.show_icon(
-                    gridLayoutWidget, current['icon'], day), 0, 1, 4, 1)
+                    gridLayoutWidget, current['icon']), 0, 1, 4, 1)
 
             # add tab to tabWidget
             self.tabWidget.addTab(tab, "")
@@ -402,6 +405,7 @@ class MainApplication(QtWidgets.QMainWindow):
             self.tabWidget.setTabText(num, date)
         # set focus to first tab
         self.tabWidget.setCurrentIndex(0)
+        self.order = []
 
         # changing QLabel widget to tabWidget in main window
         # if tabWidget is not used yet
