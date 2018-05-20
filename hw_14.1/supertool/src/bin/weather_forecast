@@ -3,8 +3,8 @@
 import argparse
 import sys
 
+import requests
 from supertool import weather as w
-
 
 if __name__ == '__main__':
 
@@ -30,6 +30,10 @@ if __name__ == '__main__':
 
     except (w.AddressException, w.ConnecionFail) as e:
         print(e.args[0])
+        sys.exit(1)
+
+    except requests.exceptions.ConnectionError:
+        print('Connection failed. Check your Internet connection.')
         sys.exit(1)
 
     # preparing

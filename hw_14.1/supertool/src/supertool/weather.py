@@ -141,7 +141,7 @@ def prepare_forecast(json_answer):
                 'wind_speed': [],
                 'description': [],
                 'icon': [],
-                'date': datetime.fromtimestamp(posixtime).strftime('%-d %B'),
+                'date': datetime.fromtimestamp(posixtime).strftime('%-d %b'),
             }
             days.append(day)
 
