@@ -140,6 +140,7 @@ def prepare_forecast(json_answer):
                 'clouds': [],
                 'wind_speed': [],
                 'description': [],
+                'icon': [],
                 'date': datetime.fromtimestamp(posixtime).strftime('%-d %B'),
             }
             days.append(day)
