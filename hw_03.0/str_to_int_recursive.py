@@ -1,12 +1,12 @@
 def fun(string, result = 0):
-    '''
+    """
     Переводит строку в числовой вид.
 
     :param str string: строка для конвертации
     :param int result: служебный
     :return: числовое представление строки
     :rtype: int
-    '''
+    """
     if len(string) > 0:
         # вычисляет на сколько умножать (на сколько сдвинуть)
         current_ord = ord(string[0])
