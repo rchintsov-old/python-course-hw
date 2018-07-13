@@ -66,4 +66,3 @@ if __name__ == '__main__':
 
     with Logger('log.txt'):
         raise TypeError('something goes wrong')
-
