@@ -1,12 +1,12 @@
 import functools
 
 def fabric(fun_2):
-    '''
+    """
     Декорирует декоратор.
     :param object fun_2: Декоратор, который нужно декорировать
     :return: Декорируемый декоратор
     :rtype: object
-    '''
+    """
     def deco_main(fun_1):
         def deco_wrapper(f):
             # задает последовательность вычислений оборачивающих функций
@@ -21,13 +21,13 @@ def fabric(fun_2):
 
 
 def lambda_executor(f):
-    '''
+    """
     Декорирует функцию лямбдой.
     Лямбда размещается внутри этой функции.
     :param object f: декорируемая функция
     :return: функция
     :rtype: object
-    '''
+    """
     @functools.wraps(f)
     def wrapper():
         # здесь размещается лямбда
@@ -36,12 +36,12 @@ def lambda_executor(f):
 
 
 def repeat(times):
-    '''
+    """
     Декоратор, вызывает функцию times раз.
     :param int times: сколько раз вызвать декорируемую функцию.
     :return: функцию
     :rtype: object
-    '''
+    """
     @fabric(lambda_executor)
     def wrapper(f):
         @functools.wraps(f)
@@ -56,15 +56,14 @@ def repeat(times):
 
 @repeat(3)
 def foo():
-    '''
+    """
     Декорируемая функция.
     Принтит собщение 'Foo called!'
     :return: 3
     :rtype: int
-    '''
+    """
     print('Foo called!')
     return 3
-
 
 
 if __name__ == '__main__':
