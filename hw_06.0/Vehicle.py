@@ -1,6 +1,5 @@
 import abc
 
-
 class Vehicle(metaclass=abc.ABCMeta):
     """
     Abstract class.
@@ -110,7 +109,6 @@ class Bus(Vehicle):
 
 
 if __name__ == '__main__':
-
 
     bus = Bus(2012, 'Man', 120000)
 
