@@ -121,7 +121,3 @@ if __name__ == '__main__':
         Vehicle.is_motorcycle(2),
         Vehicle.is_motorcycle(4),
     )
-
-
-
-
