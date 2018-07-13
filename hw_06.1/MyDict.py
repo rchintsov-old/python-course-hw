@@ -1,6 +1,5 @@
 import abc
 
-
 class MyDict(dict):
     """
     For retrieving and setting arguments by calling a dict object.
