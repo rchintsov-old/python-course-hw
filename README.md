@@ -1,2 +1,2 @@
 # python-course-hw
-Homeworks for Python cource
+Homeworks for Python cource.
