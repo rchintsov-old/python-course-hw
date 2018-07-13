@@ -15,7 +15,7 @@ class SchoolMember:
 
 class Teacher(SchoolMember):
     """
-    Класс "учитель" Наследует значения от класса SchoolMember.
+    Класс "учитель" наследует значения от класса SchoolMember.
 
     :param str name: имя.
     :param int age: возраст.
@@ -41,7 +41,7 @@ class Teacher(SchoolMember):
 
 class Student(SchoolMember):
     """
-    Класс "студент" Наследует значения от класса SchoolMember.
+    Класс "студент" наследует значения от класса SchoolMember.
 
     :param str name: имя.
     :param int age: возраст.
