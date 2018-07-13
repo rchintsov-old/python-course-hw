@@ -3,7 +3,6 @@
 Similar files finder entrypoint.
 """
 import argparse
-
 from supertool import similar_files
 
 if __name__ == '__main__':
