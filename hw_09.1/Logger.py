@@ -19,7 +19,6 @@ class Logger:
     >>> with Logger('log.txt'):
     >>>     print(1)
     # 1
-
     >>> with Logger('log.txt'):
     >>>    raise TypeError('something goes wrong')
     # TypeError: something goes wrong
