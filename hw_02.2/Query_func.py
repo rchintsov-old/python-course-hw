@@ -25,18 +25,18 @@ def field_filter_wrapper(func):
 
 @select_wrapper
 def select(field_name: list):
-    '''Принимает параметры для фильтрации полей вывода'''
+    """Принимает параметры для фильтрации полей вывода"""
     pass
 
 
 @field_filter_wrapper
 def field_filter(field_name: str, collection: list):
-    '''Принимает параметры для фильтрации по полю и значению'''
+    """Принимает параметры для фильтрации по полю и значению"""
     pass
 
 
-def query(collection: list, select: function, field_filter: function, *args) -> list:
-    '''Основная функция'''
+def query_(collection, select, field_filter, *args) -> list:
+    """Основная функция"""
     to_filter = {}
 
     # собирает параметры фильтрации и их значения
