@@ -15,7 +15,6 @@ import requests
 from PIL import Image
 from tqdm import tqdm
 
-
 class ResolutionError(Exception):
     """
     Inappropriate resolution string.
