@@ -17,7 +17,6 @@ def extract_requirements(file):
     with open(file, 'r') as file:
         return file.readlines()
 
-
 setup (
     name='stats',
     version='0.1',
@@ -30,5 +29,3 @@ setup (
     test_requires=extract_requirements(os.path.join(DISTRO_ROOT_PATCH, 'requirements', 'test.txt')),
     test_suite='nose.collector',
 )
-
-
