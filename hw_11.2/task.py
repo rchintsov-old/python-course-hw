@@ -14,7 +14,6 @@ from unittest.mock import patch
 
 from numpy import sqrt, mean
 
-
 def match_c(a, b):
     """
     Вычисляет гипотенузу треугольника.
