@@ -4,7 +4,6 @@ Tool for ranking students and tasks.
 import functools
 import itertools
 
-
 def memoized_once(func):
     """
     Decorator for funcs that need called only once.
